@@ -27,7 +27,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'User registered successfully',
+            'message' => 'Đăng ký tài khoản thành công',
             'user' => $user,
             'token' => $token
         ], 201);
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['Thông tin đăng nhập không chính xác.'],
             ]);
         }
 
@@ -50,7 +50,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
+            'message' => 'Đăng nhập thành công',
             'user' => $user,
             'token' => $token
         ]);
@@ -61,7 +61,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Successfully logged out'
+            'message' => 'Đăng xuất thành công'
         ]);
     }
 
