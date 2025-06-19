@@ -100,4 +100,11 @@ class User extends Authenticatable
     // {
     //     return $this->hasOne(Department::class, 'manager_id');
     // }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class)
+            ->withPivot('role', 'status')
+            ->withTimestamps();
+    }
 }
