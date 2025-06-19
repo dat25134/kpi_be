@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserInfoResource;
+use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng ký tài khoản thành công',
-            'user' => new UserResource($user),
+            'user' => new UserInfoResource($user),
             'token' => $token
         ], 201);
     }
@@ -52,7 +53,6 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'user' => new UserResource($user),
             'token' => $token
         ]);
     }
@@ -69,7 +69,15 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return response()->json([
-            'data' => new UserResource($request->user()),
+            'data' => new UserInfoResource($request->user()),
+            'message' => 'Lấy thông tin người dùng thành công'
+        ]);
+    }
+
+    public function profile(Request $request)
+    {
+        return response()->json([
+            'data' => new UserProfileResource($request->user()),
             'message' => 'Lấy thông tin người dùng thành công'
         ]);
     }
