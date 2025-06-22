@@ -19,5 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/departments/summary', [DepartmentController::class, 'summary']);
         Route::get('/departments/{id}', [DepartmentController::class, 'details']);
         Route::post('/departments', [DepartmentController::class, 'store']);
+        Route::put('/departments/{id}', [DepartmentController::class, 'update']);
+        Route::delete('/departments/{id}', [DepartmentController::class, 'destroy']);
     });
 });

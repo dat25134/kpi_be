@@ -66,4 +66,41 @@ class DepartmentController extends Controller
             'data' => new \App\Http\Resources\DepartmentResource($department->fresh(['manager', 'employees'])),
         ], 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        $department = \App\Models\Department::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:departments,code,' . $department->id,
+            'description' => 'nullable|string',
+            'manager_id' => 'nullable|exists:users,id',
+            'status' => 'nullable|in:active,inactive',
+        ]);
+
+        $department->update([
+            'name' => $validated['name'],
+            'code' => $validated['code'],
+            'description' => $validated['description'] ?? null,
+            'manager_id' => $validated['manager_id'] ?? null,
+            'status' => $validated['status'] ?? 'active',
+        ]);
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật phòng ban thành công',
+            'data' => new \App\Http\Resources\DepartmentResource($department->fresh(['manager', 'employees'])),
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $department = Department::findOrFail($id);
+        $department->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa phòng ban thành công',
+        ]);
+    }
 } 
