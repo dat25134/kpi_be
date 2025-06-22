@@ -53,13 +53,13 @@ class User extends Authenticatable
         'join_date' => 'date',
     ];
 
-    // /**
-    //  * Get the user's department
-    //  */
-    // public function department()
-    // {
-    //     return $this->belongsTo(Department::class);
-    // }
+    /**
+     * Get the user's department
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
 
     /**
      * Get the user's detailed information
