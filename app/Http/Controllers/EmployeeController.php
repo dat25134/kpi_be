@@ -8,6 +8,10 @@ use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\EmployeeResource;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
@@ -95,6 +99,77 @@ class EmployeeController extends Controller
                 'positionStats' => $positionStats,
             ],
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20|unique:users,phone',
+            'position' => 'required|string|in:employee,specialist,manager,director',
+            'departmentId' => 'required|integer|exists:departments,id',
+            'salary' => 'nullable|numeric|min:0',
+            'address' => 'nullable|string',
+            'birthDate' => 'nullable|date_format:d/m/Y',
+            'gender' => 'nullable|string|in:male,female,other',
+            'education' => 'nullable|string',
+            'experience' => 'nullable|string',
+            'skills' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();
+        
+        DB::beginTransaction();
+        try {
+            // 1. Tạo User
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'position' => $validated['position'],
+                'department_id' => $validated['departmentId'],
+                'password' => Hash::make('password'), // Mật khẩu mặc định
+                'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
+                'status' => 'active',
+                'join_date' => now(),
+            ]);
+
+            // 2. Tạo UserInfo
+            UserInfo::create([
+                'user_id' => $user->id,
+                'salary' => $validated['salary'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'birth_date' => isset($validated['birthDate']) ? Carbon::createFromFormat('d/m/Y', $validated['birthDate'])->format('Y-m-d') : null,
+                'gender' => $validated['gender'] ?? null,
+                'education' => $validated['education'] ?? null,
+                'experience' => $validated['experience'] ?? null,
+                'skills' => $validated['skills'] ?? [],
+            ]);
+
+            DB::commit();
+
+            // Trả về resource với đầy đủ thông tin
+            $newUser = User::with(['info', 'department', 'projects'])->find($user->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tạo nhân viên thành công',
+                'data' => new EmployeeResource($newUser),
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Tạo nhân viên thất bại.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     private function getPositionName($position)
