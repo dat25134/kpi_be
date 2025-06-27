@@ -66,7 +66,9 @@ class EmployeeController extends Controller
         $totalEmployees = User::count();
         $activeEmployees = User::where('status', 'active')->count();
         $inactiveEmployees = $totalEmployees - $activeEmployees;
-        $averageSalary = UserInfo::avg('salary');
+        $averageSalary = UserInfo::join('users', 'user_info.user_id', '=', 'users.id')
+            ->whereNull('users.deleted_at')
+            ->avg('user_info.salary');
 
         $departmentStats = Department::withCount('employees')->get()->map(function ($department) {
             return [
@@ -82,7 +84,7 @@ class EmployeeController extends Controller
             ->get()
             ->map(function ($stat) {
                 return [
-                    'position' => $this->getPositionName($stat->position),
+                    'position' => $stat->position,
                     'count' => $stat->count,
                 ];
             });
@@ -94,7 +96,7 @@ class EmployeeController extends Controller
                 'totalEmployees' => $totalEmployees,
                 'activeEmployees' => $activeEmployees,
                 'inactiveEmployees' => $inactiveEmployees,
-                'averageSalary' => (float) $averageSalary,
+                'averageSalary' => $averageSalary !== null ? round($averageSalary) : 0,
                 'departmentStats' => $departmentStats,
                 'positionStats' => $positionStats,
             ],
@@ -181,5 +183,111 @@ class EmployeeController extends Controller
             'director'   => 'Trưởng phòng',
             default      => $position,
         };
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'phone' => 'nullable|string|max:20|unique:users,phone,' . $id,
+            'position' => 'required|string|in:employee,specialist,manager,director',
+            'departmentId' => 'required|integer|exists:departments,id',
+            'salary' => 'nullable|numeric|min:0',
+            'address' => 'nullable|string',
+            'birthDate' => 'nullable|date_format:d/m/Y',
+            'gender' => 'nullable|string|in:male,female,other',
+            'education' => 'nullable|string',
+            'experience' => 'nullable|string',
+            'skills' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();   
+
+        DB::beginTransaction();
+        try {
+            // Cập nhật User
+            $user->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'position' => $validated['position'],
+                'department_id' => $validated['departmentId'],
+            ]);
+
+            // Cập nhật UserInfo
+            $user->info->update([
+                'salary' => $validated['salary'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'birth_date' => isset($validated['birthDate']) ? Carbon::createFromFormat('d/m/Y', $validated['birthDate'])->format('Y-m-d') : null,
+                'gender' => $validated['gender'] ?? null,
+                'education' => $validated['education'] ?? null,
+                'experience' => $validated['experience'] ?? null,
+                'skills' => $validated['skills'] ?? [],
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật nhân viên thành công',
+                'data' => new EmployeeResource($user),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật nhân viên thất bại.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa tài khoản quản trị viên.',
+            ], 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user->info()->delete();
+            $user->delete();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa nhân viên thành công',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Xóa nhân viên thất bại.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function details($id)
+    {
+        $user = User::with(['info', 'department', 'projects'])->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy thông tin nhân viên thành công',
+            'data' => new EmployeeResource($user),
+        ]);
     }
 } 

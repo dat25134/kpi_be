@@ -18,7 +18,7 @@ class DepartmentResource extends JsonResource
                 'id' => $manager->id,
                 'name' => $manager->name,
                 'avatar' => $manager->name ? collect(explode(' ', $manager->name))->map(fn($w) => mb_substr($w, 0, 1))->join('') : null,
-                'position' => $this->getPositionName($manager->position),
+                'position' => $manager->position,
             ] : null,
             'employee_count' => $this->employees()->count(),
             'status' => $this->status,
