@@ -17,7 +17,7 @@ class UserProfileResource extends JsonResource
             'avatarUrl' => $avatarUrl,
             'email' => $this->email,
             'phone' => $this->phone,
-            'position' => $this->getPositionName($this->position),
+            'position' => $this->position,
             'department' => $this->department ? [
                 'id' => $this->department->id,
                 'name' => $this->department->name,
@@ -25,7 +25,7 @@ class UserProfileResource extends JsonResource
             ] : null,
             'status' => $this->status,
             'joinDate' => $this->join_date ? \Carbon\Carbon::parse($this->join_date)->format('d/m/Y') : null,
-            'salary' => $this->info?->salary,
+            'salary' => $this->info?->salary !== null ? round($this->info->salary) : null,
             'address' => $this->info?->address,
             'birthDate' => $this->info?->birth_date ? \Carbon\Carbon::parse($this->info->birth_date)->format('d/m/Y') : null,
             'gender' => $this->info?->gender,
