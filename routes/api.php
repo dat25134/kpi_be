@@ -18,19 +18,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
 
         // Department
-        Route::get('/departments', [DepartmentController::class, 'departments']);
-        Route::get('/departments/summary', [DepartmentController::class, 'summary']);
-        Route::get('/departments/{id}', [DepartmentController::class, 'details']);
-        Route::post('/departments', [DepartmentController::class, 'store']);
-        Route::put('/departments/{id}', [DepartmentController::class, 'update']);
-        Route::delete('/departments/{id}', [DepartmentController::class, 'destroy']);
+        Route::group(['prefix' => 'departments'], function () {
+            Route::get('/', [DepartmentController::class, 'departments']);
+            Route::get('/summary', [DepartmentController::class, 'summary']);
+            Route::get('/{id}', [DepartmentController::class, 'details']);
+            Route::post('/', [DepartmentController::class, 'store']);
+            Route::put('/{id}', [DepartmentController::class, 'update']);
+            Route::delete('/{id}', [DepartmentController::class, 'destroy']);
+        });
 
         // Employee
-        Route::get('/employees', [EmployeeController::class, 'employees']);
-        Route::get('/employees/summary', [EmployeeController::class, 'summary']);
-        Route::post('/employees', [EmployeeController::class, 'store']);
-        Route::get('/employees/{id}', [EmployeeController::class, 'details']);
-        Route::put('/employees/{id}', [EmployeeController::class, 'update']);
-        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
+        Route::group(['prefix' => 'employees'], function () {
+            Route::get('/director', [EmployeeController::class, 'director']);
+            Route::get('/', [EmployeeController::class, 'employees']);
+            Route::get('/summary', [EmployeeController::class, 'summary']);
+            Route::post('/', [EmployeeController::class, 'store']);
+            Route::get('/{id}', [EmployeeController::class, 'details']);
+            Route::put('/{id}', [EmployeeController::class, 'update']);
+            Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+
+        });
     });
 });

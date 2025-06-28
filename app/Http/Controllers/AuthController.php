@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserInfoResource;
 use App\Http\Resources\UserProfileResource;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,14 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -35,13 +31,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Thông tin đăng nhập không chính xác.'],
@@ -53,6 +44,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng nhập thành công',
+            'user' => new UserInfoResource($user),
             'token' => $token
         ]);
     }
@@ -76,9 +68,6 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
-        return response()->json([
-            'data' => new UserProfileResource($request->user()),
-            'message' => 'Lấy thông tin người dùng thành công'
-        ]);
+        return response()->json(new UserProfileResource($request->user()));
     }
 } 
