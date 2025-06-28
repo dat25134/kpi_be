@@ -48,10 +48,10 @@ class User extends Authenticatable
      * @return array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
         'join_date' => 'date',
-    ];
+        ];
 
     /**
      * Get the user's department
