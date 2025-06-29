@@ -67,7 +67,7 @@ class EmployeeController extends Controller
 
     public function store(StoreEmployeeRequest $request)
     {
-        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId', 'roleName');
+        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId', 'roleName');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->createEmployee($userData, $userInfoData);
         if ($result) {
@@ -86,7 +86,7 @@ class EmployeeController extends Controller
 
     public function update(UpdateEmployeeRequest $request, $id)
     {
-        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId','roleName');
+        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId','roleName');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->updateEmployee($id, $userData, $userInfoData);
 

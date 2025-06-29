@@ -27,6 +27,7 @@ class EmployeeResource extends JsonResource
                 'name' => 'Chưa có phòng ban',
                 'code' => 'N/A'
             ],
+            'cccd' => $this->cccd,
             'status' => $this->status,
             'joinDate' => $this->join_date ? Carbon::parse($this->join_date)->format('d/m/Y') : null,
             'salary' => $this->info?->salary !== null ? round($this->info->salary) : null,

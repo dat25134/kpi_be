@@ -12,8 +12,8 @@ class UpdateUsersTable extends Migration
             $table->string('employee_id')->unique()->after('id');
             $table->string('phone')->nullable()->after('email');
             $table->unsignedBigInteger('department_id')->nullable()->after('phone');
-            $table->enum('position', ['employee','specialist', 'manager', 'director'])->default('employee')->after('department_id');
-            $table->enum('status', ['active', 'inactive'])->default('active')->after('position');
+            $table->string('cccd')->nullable()->after('department_id');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->date('join_date')->nullable()->after('status');
             $table->softDeletes();
             

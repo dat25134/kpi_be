@@ -108,6 +108,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'email' => $userData['email'],
                 'phone' => $userData['phone'] ?? null,
                 'department_id' => $userData['departmentId'],
+                'cccd' => $userData['cccd'] ?? null,
                 'password' => Hash::make('password'), // Mật khẩu mặc định
                 'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
                 'status' => 'active',
@@ -149,6 +150,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'email' => $userData['email'],
                 'phone' => $userData['phone'] ?? null,
                 'department_id' => $userData['departmentId'],
+                'cccd' => $userData['cccd'] ?? null,
             ]);
             $user->syncRoles([$userData['roleName']]);
 

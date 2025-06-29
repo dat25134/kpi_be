@@ -26,6 +26,7 @@ class StoreEmployeeRequest extends FormRequest
             'experience' => 'nullable|string',
             'skills' => 'nullable|array',
             'roleName' => 'required|string|exists:roles,name',
+            'cccd' => 'nullable|string|max:20|unique:users,cccd',
         ];
     }
 
@@ -55,6 +56,9 @@ class StoreEmployeeRequest extends FormRequest
             'roleName.required' => 'Vai trò là bắt buộc.',
             'roleName.string' => 'Vai trò phải là chuỗi ký tự.',
             'roleName.exists' => 'Vai trò không tồn tại.',
+            'cccd.string' => 'CCCD phải là chuỗi ký tự.',
+            'cccd.max' => 'CCCD không được vượt quá 20 ký tự.',
+            'cccd.unique' => 'CCCD đã tồn tại.',
         ];
     }
 }
