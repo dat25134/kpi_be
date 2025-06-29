@@ -74,4 +74,9 @@ class DepartmentRepository extends BaseRepository implements DepartmentRepositor
     {
         return $this->model->with(['manager', 'employees'])->findOrFail($id);
     }
+
+    public function listDepartmentToSelect()
+    {
+        return $this->model->get(['id', 'name']);
+    }
 }

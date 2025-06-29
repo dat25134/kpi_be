@@ -15,4 +15,6 @@ interface DepartmentRepositoryInterface extends BaseRepositoryInterface
      * Lấy thống kê phòng ban
      */
     public function getDepartmentStats(): array;
+
+    public function listDepartmentToSelect();
 } 

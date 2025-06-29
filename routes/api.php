@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Department
         Route::group(['prefix' => 'departments'], function () {
+            Route::get('/select', [DepartmentController::class, 'select']);
             Route::get('/', [DepartmentController::class, 'departments']);
             Route::get('/summary', [DepartmentController::class, 'summary']);
             Route::get('/{id}', [DepartmentController::class, 'details']);
