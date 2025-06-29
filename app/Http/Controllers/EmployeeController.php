@@ -60,14 +60,14 @@ class EmployeeController extends Controller
                 'inactiveEmployees' => $stats['inactiveEmployees'],
                 'averageSalary' => $stats['averageSalary'] !== null ? round($stats['averageSalary']) : 0,
                 'departmentStats' => $stats['departmentStats'],
-                'positionStats' => $stats['positionStats'],
+                'roleStats' => $stats['roleStats'],
             ],
         ]);
     }
 
     public function store(StoreEmployeeRequest $request)
     {
-        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId');
+        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId', 'roleName');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->createEmployee($userData, $userInfoData);
         if ($result) {
@@ -86,7 +86,7 @@ class EmployeeController extends Controller
 
     public function update(UpdateEmployeeRequest $request, $id)
     {
-        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId');
+        $userData = $request->only('name', 'email', 'phone', 'position', 'departmentId','roleName');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->updateEmployee($id, $userData, $userInfoData);
 
@@ -132,14 +132,14 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function director(Request $request)
+    public function manager(Request $request)
     {
-        $director = $this->userRepository->director();
+        $truongphong = $this->userRepository->manager();
 
         return response()->json([
             'success' => true,
             'message' => 'Lấy danh sách trưởng phòng thành công',
-            'data' => EmployeeResource::collection($director),
+            'data' => EmployeeResource::collection($truongphong),
         ]);
     }
 } 

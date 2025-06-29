@@ -44,7 +44,7 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     /**
      * Lấy user có role director
      */
-    public function director();
+    public function manager();
 
     /**
      * Lấy thông tin nhân viên

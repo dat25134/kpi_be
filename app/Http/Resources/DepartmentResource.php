@@ -18,9 +18,24 @@ class DepartmentResource extends JsonResource
                 'id' => $manager->id,
                 'name' => $manager->name,
                 'avatar' => $manager->name ? collect(explode(' ', $manager->name))->map(fn($w) => mb_substr($w, 0, 1))->join('') : null,
-                'position' => $manager->position,
+                'role' => [
+                    'name' => $manager->getRoleNames()->first(),
+                    'displayName' => optional($manager->roles->first())->display_name,
+                    'color' => optional($manager->roles->first())->color,
+                ],
             ] : null,
             'employee_count' => $this->employees()->count(),
+            'employees' => $this->employees->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'role' => [
+                        'name' => $employee->getRoleNames()->first(),
+                        'displayName' => optional($employee->roles->first())->display_name,
+                        'color' => optional($employee->roles->first())->color,
+                    ],
+                ];
+            }),
             'status' => $this->status,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
         ];

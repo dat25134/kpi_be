@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Role as AppRole;
 
 class RoleSeeder extends Seeder
 {
@@ -13,18 +14,63 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles
-        $adminRole = Role::create([
-            'name' => 'admin',
-            'display_name' => 'Administrator',
-            'description' => 'Full access to all features'
-        ]);
+        // Create roles with full info
+        $roles = [
+            [
+                'name' => 'admin',
+                'code' => 'ADMIN',
+                'display_name' => 'Quản trị viên',
+                'description' => 'Quản trị viên hệ thống, toàn quyền',
+                'order' => 0,
+                'status' => 'active',
+                'guard_name' => 'web',
+                'color' => 'green',
+            ],
+            [
+                'name' => 'truongphong',
+                'code' => 'LDT',
+                'display_name' => 'Trưởng phòng',
+                'description' => 'Trưởng phòng, quản lý cấp trung',
+                'order' => 1,
+                'status' => 'active',
+                'guard_name' => 'web',
+                'color' => 'blue',
+            ],
+            [
+                'name' => 'chuyenvien',
+                'code' => 'CV',
+                'display_name' => 'Chuyên viên',
+                'description' => 'Chuyên viên nghiệp vụ',
+                'order' => 2,
+                'status' => 'active',
+                'guard_name' => 'web',
+                'color' => 'yellow',
+            ],
+            [
+                'name' => 'nhanvien',
+                'code' => 'NV',
+                'display_name' => 'Nhân viên',
+                'description' => 'Nhân viên thông thường',
+                'order' => 3,
+                'status' => 'active',
+                'guard_name' => 'web',  
+                'color' => 'red',
+            ],
+            [
+                'name' => 'thuctapsinh',
+                'code' => 'TTS',
+                'display_name' => 'Thực tập sinh',
+                'description' => 'Thực tập sinh',
+                'order' => 4,
+                'status' => 'active',
+                'guard_name' => 'web',
+                'color' => 'purple',
+            ],
+        ];
 
-        $userRole = Role::create([
-            'name' => 'user',
-            'display_name' => 'Normal User',
-            'description' => 'Basic access to features'
-        ]);
+        foreach ($roles as $role) {
+            AppRole::create($role);
+        }
 
         // // Create basic permissions
         // $permissions = [

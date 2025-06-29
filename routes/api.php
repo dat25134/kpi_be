@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\RoleController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -30,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Employee
         Route::group(['prefix' => 'employees'], function () {
-            Route::get('/director', [EmployeeController::class, 'director']);
+            Route::get('/manager', [EmployeeController::class, 'manager']);
             Route::get('/', [EmployeeController::class, 'employees']);
             Route::get('/summary', [EmployeeController::class, 'summary']);
             Route::post('/', [EmployeeController::class, 'store']);
@@ -40,4 +41,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         });
     });
+});
+
+// Role management
+Route::prefix('roles')->group(function () {
+    Route::get('/selection', [RoleController::class, 'selection']);
+    Route::get('/', [RoleController::class, 'index']); // Danh sách
+    Route::get('/{id}', [RoleController::class, 'show']); // Chi tiết
+    Route::post('/', [RoleController::class, 'store']); // Thêm mới
+    Route::put('/{id}', [RoleController::class, 'update']); // Cập nhật
+    Route::delete('/{id}', [RoleController::class, 'destroy']); // Xóa
 });

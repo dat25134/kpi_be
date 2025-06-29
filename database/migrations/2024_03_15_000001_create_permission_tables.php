@@ -25,8 +25,12 @@ class CreatePermissionTables extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('guard_name');
-            $table->string('display_name')->nullable();
+            $table->string('code')->unique();
+            $table->string('display_name');
             $table->text('description')->nullable();
+            $table->string('color')->nullable();
+            $table->unsignedTinyInteger('level')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
             $table->unique(['name', 'guard_name']);
         });
