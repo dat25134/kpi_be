@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RoleController;
+use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -40,15 +39,17 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{id}', [EmployeeController::class, 'destroy']);
 
         });
-    });
-});
 
-// Role management
-Route::prefix('roles')->group(function () {
-    Route::get('/selection', [RoleController::class, 'selection']);
-    Route::get('/', [RoleController::class, 'index']); // Danh sách
-    Route::get('/{id}', [RoleController::class, 'show']); // Chi tiết
-    Route::post('/', [RoleController::class, 'store']); // Thêm mới
-    Route::put('/{id}', [RoleController::class, 'update']); // Cập nhật
-    Route::delete('/{id}', [RoleController::class, 'destroy']); // Xóa
+        // Role management
+        Route::prefix('roles')->group(function () {
+            Route::put('/reorder', [RoleController::class, 'reorder']);     // Sắp xếp
+            Route::get('/selection', [RoleController::class, 'selection']);
+            Route::get('/summary', [RoleController::class, 'summary']);
+            Route::get('/', [RoleController::class, 'index']);          // Danh sách
+            Route::get('/{id}', [RoleController::class, 'show']);       // Chi tiết
+            Route::post('/', [RoleController::class, 'store']);         // Thêm mới
+            Route::put('/{id}', [RoleController::class, 'update']);     // Cập nhật
+            Route::delete('/{id}', [RoleController::class, 'destroy']); // Xóa
+        });
+    });
 });

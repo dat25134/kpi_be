@@ -14,12 +14,17 @@ class RoleResource extends JsonResource
             'code' => $this->code,
             'display_name' => $this->display_name,
             'description' => $this->description,
-            'level' => $this->level,
             'status' => $this->status,
-            'guard_name' => $this->guard_name,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'order' => $this->order,
+            'color' => $this->color,
+            'employee_count' => $this->users ? $this->users->count() : 0,
+            'employees' => $this->users ? $this->users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar' => $user->avatar,
+                ];
+            }) : [],
         ];
     }
 } 
