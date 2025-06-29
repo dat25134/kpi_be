@@ -75,4 +75,14 @@ class DepartmentController extends Controller
             'message' => 'Xóa phòng ban thành công',
         ]);
     }
+
+    public function select()
+    {
+        $department = $this->departmentRepository->listDepartmentToSelect();
+        return response()->json([
+            'status' => true,
+            'messgae' => "Lấy dữ liệu phòng ban thành công",
+            'data' => $department
+        ]);
+    }
 }
