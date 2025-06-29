@@ -17,7 +17,6 @@ class UserProfileResource extends JsonResource
             'avatarUrl' => $avatarUrl,
             'email' => $this->email,
             'phone' => $this->phone,
-            'position' => $this->position,
             'department' => $this->department ? [
                 'id' => $this->department->id,
                 'name' => $this->department->name,
@@ -39,17 +38,16 @@ class UserProfileResource extends JsonResource
                     'status' => $project->pivot->status,
                 ];
             }),
+            'role' => [
+                'name' => $this->getRoleNames()->first(),
+                'displayName' => optional($this->roles->first())->display_name,
+                'color' => optional($this->roles->first())->color,
+            ],
         ];
     }
 
     private function getPositionName($position)
     {
-        return match ($position) {
-            'employee'   => 'Nhân viên',
-            'specialist' => 'Chuyên viên',
-            'manager'    => 'Phó phòng',
-            'director'   => 'Trưởng phòng',
-            default      => $position,
-        };
+        // Đã xóa function này vì không còn dùng
     }
 } 

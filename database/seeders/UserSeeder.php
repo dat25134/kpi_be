@@ -23,33 +23,18 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'phone' => '+84 123 456 789',
-            'position' => 'director',
             'status' => 'active',
             'join_date' => '2020-01-01',
             'password' => Hash::make('admin@1234'),
         ]);
         $admin->assignRole('admin');
 
-        // Tạo User Test
-        $user = User::create([
-            'employee_id' => 'EMP002',
-            'name' => 'User Test',
-            'email' => 'user@test.com',
-            'phone' => '+84 987 654 321',
-            'position' => 'employee',
-            'status' => 'active',
-            'join_date' => '2022-05-15',
-            'password' => Hash::make('user@1234'),
-        ]);
-        $user->assignRole('user');
-
         // Tạo 30 nhân viên fake
-        $positions = ['employee', 'specialist', 'manager', 'director'];
         $statuses = ['active', 'inactive'];
         $departments = range(1, 20); // Có 20 departments từ seeder
 
         for ($i = 3; $i <= 32; $i++) {
-            $position = $faker->randomElement($positions);
+            $role = $faker->randomElement(['nhanvien', 'chuyenvien', 'truongphong', 'thuctapsinh']);
             $status = $faker->randomElement($statuses);
             $departmentId = $faker->randomElement($departments);
             
@@ -58,19 +43,12 @@ class UserSeeder extends Seeder
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
                 'phone' => $faker->phoneNumber,
-                'position' => $position,
                 'department_id' => $departmentId,
                 'status' => $status,
                 'join_date' => $faker->dateTimeBetween('-3 years', 'now'),
                 'password' => Hash::make('password'),
             ]);
-
-            // Gán role dựa trên position
-            if ($position === 'director') {
-                $user->assignRole('admin');
-            } else {
-                $user->assignRole('user');
-            }
+            $user->assignRole($role);
         }
     }
 }

@@ -41,12 +41,12 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             $query->where('department_id', $filters['department_id']);
         }
 
-        if (isset($filters['position']) && !empty($filters['position'])) {
-            $query->where('position', $filters['position']);
-        }
-
         if (isset($filters['status']) && !empty($filters['status'])) {
             $query->where('status', $filters['status']);
+        }
+
+        if (isset($filters['role_name']) && !empty($filters['role_name'])) {
+            $query->role($filters['role_name']);
         }
 
         return $query->paginate($limit);
@@ -74,12 +74,15 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             ->get()
             ->toArray();
 
-        $positionStats = $this->model->select('position', DB::raw('count(*) as count'))
-            ->groupBy('position')
+        // Thống kê số lượng user theo role
+        $roleStats = DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->select('roles.name as role', DB::raw('count(model_has_roles.model_id) as count'))
+            ->groupBy('roles.name')
             ->get()
             ->map(function ($stat) {
                 return [
-                    'position' => $stat->position,
+                    'role' => $stat->role,
                     'count' => $stat->count,
                 ];
             })
@@ -91,7 +94,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             'inactiveEmployees' => $inactiveEmployees,
             'averageSalary' => $averageSalary !== null ? round($averageSalary) : 0,
             'departmentStats' => $departmentStats,
-            'positionStats' => $positionStats,
+            'roleStats' => $roleStats,
         ];
     }
 
@@ -104,13 +107,13 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'name' => $userData['name'],
                 'email' => $userData['email'],
                 'phone' => $userData['phone'] ?? null,
-                'position' => $userData['position'],
                 'department_id' => $userData['departmentId'],
                 'password' => Hash::make('password'), // Mật khẩu mặc định
                 'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
                 'status' => 'active',
                 'join_date' => now(),
             ]);
+            $user->syncRoles([$userData['roleName']]);
 
             // Tạo UserInfo
             UserInfo::create([
@@ -145,9 +148,9 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'name' => $userData['name'],
                 'email' => $userData['email'],
                 'phone' => $userData['phone'] ?? null,
-                'position' => $userData['position'],
                 'department_id' => $userData['departmentId'],
             ]);
+            $user->syncRoles([$userData['roleName']]);
 
             // Cập nhật UserInfo
             $user->info->update([
@@ -202,17 +205,9 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return $this->model->where('email', $email)->first();
     }
 
-    /**
-     * Lấy danh sách director (trưởng phòng)
-     */
-    public function getDirectors(): Collection
+    public function manager()
     {
-        return $this->model->where('position', 'director')->get();
-    }
-
-    public function director()
-    {
-        return $this->model->where('position', 'director')->get();
+        return $this->model->role('truongphong')->get();
     }
 
     public function details(int $id)

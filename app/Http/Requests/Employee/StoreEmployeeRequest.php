@@ -17,7 +17,6 @@ class StoreEmployeeRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:20|unique:users,phone',
-            'position' => 'required|string|in:employee,specialist,manager,director',
             'departmentId' => 'required|integer|exists:departments,id',
             'salary' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
@@ -26,6 +25,7 @@ class StoreEmployeeRequest extends FormRequest
             'education' => 'nullable|string',
             'experience' => 'nullable|string',
             'skills' => 'nullable|array',
+            'roleName' => 'required|string|exists:roles,name',
         ];
     }
 
@@ -41,8 +41,6 @@ class StoreEmployeeRequest extends FormRequest
             'phone.string' => 'Số điện thoại phải là chuỗi ký tự.',
             'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
             'phone.unique' => 'Số điện thoại đã tồn tại.',
-            'position.required' => 'Chức vụ là bắt buộc.',
-            'position.in' => 'Chức vụ phải là employee, specialist, manager hoặc director.',
             'departmentId.required' => 'Phòng ban là bắt buộc.',
             'departmentId.integer' => 'ID phòng ban phải là số nguyên.',
             'departmentId.exists' => 'Phòng ban không tồn tại.',
@@ -54,6 +52,9 @@ class StoreEmployeeRequest extends FormRequest
             'education.string' => 'Học vấn phải là chuỗi ký tự.',
             'experience.string' => 'Kinh nghiệm phải là chuỗi ký tự.',
             'skills.array' => 'Kỹ năng phải là mảng.',
+            'roleName.required' => 'Vai trò là bắt buộc.',
+            'roleName.string' => 'Vai trò phải là chuỗi ký tự.',
+            'roleName.exists' => 'Vai trò không tồn tại.',
         ];
     }
 }
