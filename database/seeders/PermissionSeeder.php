@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use App\Models\ModulePermission;
+use App\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -56,5 +57,8 @@ class PermissionSeeder extends Seeder
                 ]
             );
         }
+
+        $adminRole = Role::where('name', 'admin')->first();
+        $adminRole->syncPermissions(Permission::all());
     }
 } 

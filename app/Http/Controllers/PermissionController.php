@@ -29,4 +29,27 @@ class PermissionController extends Controller
             'data' => ModulePermissionResource::collection($modulePermissions),
         ]);
     }
+
+    public function syncPermission(Request $request)
+    {
+        $request->validate([
+            'role_id' => 'nullable|exists:roles,id',
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'exists:permissions,id',
+        ]);
+
+        $role = \Spatie\Permission\Models\Role::findOrFail($request->role_id);
+        if ($role->name === 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể thay đổi quyền của quản trị viên (admin)!'
+            ], 400);
+        }
+        $role->syncPermissions($request->permission_ids ?? []);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật quyền cho role thành công!'
+        ]);
+    }
 }

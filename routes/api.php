@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('permissions')->group(function () {
             Route::get('/', [PermissionController::class, 'index']);
             Route::get('/permission-modules', [PermissionController::class, 'modulePermission']);
+            Route::post('/sync-permission', [PermissionController::class, 'syncPermission']);
         });
     });
 });
