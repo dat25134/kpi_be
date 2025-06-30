@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [RoleController::class, 'store']);         // Thêm mới
             Route::put('/{id}', [RoleController::class, 'update']);     // Cập nhật
             Route::delete('/{id}', [RoleController::class, 'destroy']); // Xóa
+        });
+
+        // Permission management
+        Route::prefix('permissions')->group(function () {
+            Route::get('/', [PermissionController::class, 'index']);
+            Route::get('/permission-modules', [PermissionController::class, 'modulePermission']);
         });
     });
 });

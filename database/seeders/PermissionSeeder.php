@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use App\Models\ModulePermission;
 
 class PermissionSeeder extends Seeder
 {
@@ -43,11 +44,12 @@ class PermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
+            $modulePermission = ModulePermission::where('name', $permission['module'])->first();
             Permission::updateOrCreate(
                 ['name' => $permission['name']],
                 [
                     'display_name' => $permission['display_name'],
-                    'module' => $permission['module'],
+                    'module_permission_id' => $modulePermission ? $modulePermission->id : null,
                     'category' => $permission['category'],
                     'description' => $permission['description'],
                     'guard_name' => 'web',
