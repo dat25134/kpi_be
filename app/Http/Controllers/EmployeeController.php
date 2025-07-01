@@ -44,6 +44,16 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function allEmployees(Request $request)
+    {
+        $employees = $this->userRepository->all();
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy danh sách nhân viên thành công',
+            'data' => EmployeeResource::collection($employees),
+        ]);
+    }
+
     /**
      * Lấy thống kê tổng quan về nhân viên
      */

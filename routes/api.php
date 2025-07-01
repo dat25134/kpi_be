@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -13,9 +15,28 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user/info', [AuthController::class, 'user']);
-    Route::get('/user/profile', [AuthController::class, 'profile']);
+    // User
+    Route::group([], function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/user/info', [AuthController::class, 'user']);
+        Route::get('/user/profile', [AuthController::class, 'profile']);
+
+        // Category
+        Route::prefix('categories')->group(function () {
+            Route::get('/', [CategoryController::class, 'index']);
+        });
+
+        // Employee
+        Route::prefix('employees')->group(function () {
+            Route::get('/all-employees', [EmployeeController::class, 'allEmployees']);
+        });
+
+        //Task
+        Route::prefix('tasks')->group(function () {
+            Route::get('/', [TaskController::class, 'index']);
+        });
+    });
+    // Admin
     Route::middleware('role:admin')->group(function () {
 
         // Department
@@ -38,12 +59,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [EmployeeController::class, 'details']);
             Route::put('/{id}', [EmployeeController::class, 'update']);
             Route::delete('/{id}', [EmployeeController::class, 'destroy']);
-
         });
 
         // Role management
         Route::prefix('roles')->group(function () {
-            Route::put('/reorder', [RoleController::class, 'reorder']);     // Sắp xếp
+            Route::put('/reorder', [RoleController::class, 'reorder']); // Sắp xếp
             Route::get('/selection', [RoleController::class, 'selection']);
             Route::get('/summary', [RoleController::class, 'summary']);
             Route::get('/', [RoleController::class, 'index']);          // Danh sách

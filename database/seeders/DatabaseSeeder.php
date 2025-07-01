@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             ProjectSeeder::class,
             ModulePermissionSeeder::class,
             PermissionSeeder::class,
+            CategorySeeder::class,
+            TaskSeeder::class,
         ]);
     }
 }
