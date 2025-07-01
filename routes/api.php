@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [PermissionController::class, 'index']);
             Route::get('/permission-modules', [PermissionController::class, 'modulePermission']);
             Route::post('/sync-permission', [PermissionController::class, 'syncPermission']);
+            Route::post('/sync-permission-by-employee', [PermissionController::class, 'syncPermissionByEmployee']);
         });
     });
 });

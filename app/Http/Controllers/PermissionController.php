@@ -52,4 +52,27 @@ class PermissionController extends Controller
             'message' => 'Cập nhật quyền cho role thành công!'
         ]);
     }
+
+    public function syncPermissionByEmployee(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:users,id',
+            'permission_ids' => 'nullable|array',
+            'permission_ids.*' => 'exists:permissions,id',
+        ]);
+
+        $user = \App\Models\User::findOrFail($request->employee_id);
+        if ($user->hasRole('admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể thay đổi quyền trực tiếp của quản trị viên (admin)!'
+            ], 400);
+        }
+        $user->syncPermissions($request->permission_ids ?? []);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật quyền cho nhân viên thành công!'
+        ]);
+    }
 }
