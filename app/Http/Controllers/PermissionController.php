@@ -33,8 +33,8 @@ class PermissionController extends Controller
     public function syncPermission(Request $request)
     {
         $request->validate([
-            'role_id' => 'nullable|exists:roles,id',
-            'permission_ids' => 'required|array',
+            'role_id' => 'required|exists:roles,id',
+            'permission_ids' => 'nullable|array',
             'permission_ids.*' => 'exists:permissions,id',
         ]);
 
