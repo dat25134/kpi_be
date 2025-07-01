@@ -17,6 +17,7 @@ class RoleResource extends JsonResource
             'status' => $this->status,
             'order' => $this->order,
             'color' => $this->color,
+            'permissions' => $this->permissions ? $this->permissions->pluck('id')->toArray() : [],
             'employee_count' => $this->users ? $this->users->count() : 0,
             'employees' => $this->users ? $this->users->map(function ($user) {
                 return [
