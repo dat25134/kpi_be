@@ -43,4 +43,9 @@ interface BaseRepositoryInterface
      * Tìm kiếm records
      */
     public function search(array $criteria);
+
+    /**
+     * Lấy record theo field và value
+     */
+    public function findBy($field, $value);
 } 
