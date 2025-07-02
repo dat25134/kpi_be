@@ -7,6 +7,8 @@ use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 class TaskRepository extends BaseRepository implements TaskRepositoryInterface
 {
     public function __construct(Task $model)
@@ -54,7 +56,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'assigner_id' => $data['assigner'],
             'main_assignee_id' => $data['mainHandler'],
             'status' => 'in_progress',
-            'created_by' => auth()->user()->id,
+            'created_by' => Auth::user()->id,
         ];
         $dataCollaborators = $data['assignees'];
 
