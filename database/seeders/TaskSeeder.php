@@ -31,7 +31,7 @@ class TaskSeeder extends Seeder
 
             $task = Task::create([
                 'content' => "Task $i: Nội dung công việc mẫu để test phân trang.",
-                'start_date' => now()->addDays($i)->toDateString(),
+                'start_date' => now()->subDays($i)->toDateString(),
                 'due_date' => now()->addDays($i + 7)->toDateString(),
                 'category_id' => $category->id,
                 'weight' => rand(1, 5),
