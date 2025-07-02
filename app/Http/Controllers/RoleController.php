@@ -10,12 +10,21 @@ use App\Http\Resources\RoleSelectionResource;
 use App\Http\Resources\RoleSummaryResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Repositories\RoleRepository;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
+    protected $roleRepository;
+
+    public function __construct(RoleRepository $roleRepository)
+    {
+        $this->roleRepository = $roleRepository;
+    }
+
     public function index(Request $request)
     {
-        $roles = Role::orderBy('order', 'asc')->get();
+        $roles = $this->roleRepository->getRole();
 
         return response()->json([
             'status' => true,
@@ -26,37 +35,45 @@ class RoleController extends Controller
 
     public function show($id)
     {
-        $role = Role::findOrFail($id);
-        return new RoleResource($role);
+        $role = $this->roleRepository->find($id);
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy vị trí thành công',
+            'data' => new RoleResource($role),
+        ]);
     }
 
     public function store(StoreRoleRequest $request)
     {
-        $data = $request->all();
-        $data['color'] = $request->color ?? Role::generateUniqueColor();
-        $data['order'] = Role::max('order') + 1;
-        $data['name'] = Str::slug($data['display_name'], '');
-        $data['guard_name'] = 'web';
-        $role = Role::create($data);
+        $role = $this->roleRepository->createRole($request->all());
         return response()->json([
             'status' => true,
-            'message' => 'Thêm vị trí thành công',
+            'message' => 'Tạo vị trí mới thành công',
             'data' => new RoleResource($role),
         ]);
     }
 
     public function update(UpdateRoleRequest $request, $id)
     {
-        $role = Role::findOrFail($id);
-        $role->update($request->validated());
-        return new RoleResource($role);
+        $result = $this->roleRepository->updateRole($id, $request->all());
+        if ($result) {  
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật vị trí thành công',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cập nhật vị trí thất bại',
+            ], 500);
+        }
     }
 
     public function destroy($id)
     {
-        $role = Role::findOrFail($id);
+        $role = $this->roleRepository->find($id);
         if ($role->name == 'admin') {   
-            return response()->json(['message' => 'Không thể xóa vị trí admin'], 400);
+            return response()->json(['message' => 'Không thể xóa vị trí admin'], 500);
         }
         $role->delete();
         return response()->json([
@@ -67,7 +84,7 @@ class RoleController extends Controller
 
     public function selection()
     {
-        $roles = Role::where('status', 'active')->get(['id', 'name', 'display_name']);
+        $roles = $this->roleRepository->listRoleToSelect();
         return response()->json([
             'status' => true,
             'message' => 'Lấy danh sách role thành công',
@@ -77,29 +94,26 @@ class RoleController extends Controller
 
     public function summary()
     {
-        $totalRoles = Role::count();
-        $activeRoles = Role::where('status', 'active')->count();
-        $inactiveRoles = Role::where('status', 'inactive')->count();
-        $totalEmployees = \App\Models\User::count();
-        $highestRole = Role::orderBy('order', 'asc')->first();
+        $summary = $this->roleRepository->summary();
 
         return response()->json([
             'success' => true,
             'message' => 'Lấy thống kê vị trí thành công',
             'data' => [
-                'totalRoles' => $totalRoles,
-                'activeRoles' => $activeRoles,
-                'inactiveRoles' => $inactiveRoles,
-                'totalEmployees' => $totalEmployees,
-                'highestRole' => $highestRole ? $highestRole->display_name : null,
+                'totalRoles' => $summary['totalRoles'],
+                'activeRoles' => $summary['activeRoles'],
+                'inactiveRoles' => $summary['inactiveRoles'],
+                'totalEmployees' => $summary['totalEmployees'],
+                'highestRole' => $summary['highestRole'] ? $summary['highestRole']->display_name : null,
             ],
         ]);
     }
 
     public function reorder(Request $request)
-    {
+    {  
+        try{ 
         $roleIds = $request->input('roleIds', []);
-        $adminRole = \App\Models\Role::where('name', 'admin')->first();
+        $adminRole = $this->roleRepository->findBy('name', 'admin');
 
         if ($adminRole) {
             $adminIndex = array_search($adminRole->id, $roleIds);
@@ -110,13 +124,21 @@ class RoleController extends Controller
                 ], 400);
             }
         }
-
+        DB::beginTransaction();
         foreach ($roleIds as $index => $roleId) {
             \App\Models\Role::where('id', $roleId)->update(['order' => $index]);
         }
+        DB::commit();
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'Sắp xếp lại thứ tự role thành công'
         ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Sắp xếp lại thứ tự role thất bại'
+            ], 500);
+        }
     }
 } 

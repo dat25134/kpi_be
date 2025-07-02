@@ -113,5 +113,13 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function setModel(Model $model): void
     {
         $this->model = $model;
+    }   
+
+    /**
+     * Lấy record theo field và value
+     */
+    public function findBy($field, $value)
+    {
+        return $this->model->where($field, $value)->first();
     }
 } 

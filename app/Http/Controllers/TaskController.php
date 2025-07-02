@@ -6,39 +6,20 @@ use App\Models\Task;
 use App\Http\Resources\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\TaskRepository;
 
 class TaskController extends Controller
 {
+    protected $taskRepository;
+
+    public function __construct(TaskRepository $taskRepository)
+    {
+        $this->taskRepository = $taskRepository;
+    }
+
     public function index(Request $request)
     {
-        $query = Task::with(['category', 'assigner', 'mainAssignee', 'collaborators']);
-
-        if ($request->filled('startDate')) {
-            $query->whereDate('start_date', '>=', $request->startDate);
-        }
-        if ($request->filled('endDate')) {
-            $query->whereDate('start_date', '<=', $request->endDate);
-        }
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('content', 'like', "%$search%")
-                  ->orWhereHas('category', function($q2) use ($search) {
-                      $q2->where('display_name', 'like', "%$search%")
-                         ->orWhere('name', 'like', "%$search%");
-                  });
-            });
-        }
-        $pageSize = $request->input('pageSize', 10);
-        $tasks = $query->paginate($pageSize);
+        $tasks = $this->taskRepository->getTasksWithFilters($request->all());
 
         return response()->json([
             'success' => true, 
