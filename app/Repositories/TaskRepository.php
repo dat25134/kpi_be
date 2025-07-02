@@ -40,8 +40,11 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             $query->where('content', 'like', "%{$filters['search']}%");
         }
 
-        $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
+        if (isset($filters['itemsPerPage'])) {
+            $limit = $filters['itemsPerPage'];
+        }
 
+        $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
         return $query->paginate($limit);
     }
 
