@@ -20,11 +20,10 @@ class TaskResource extends JsonResource
                 ];
             }),
             "count"            => $this->weight,
-            "startDate"        => Carbon::parse($this->start_date)->format('d/m/Y'),
-            "deadline"         => Carbon::parse($this->due_date)->format('d/m/Y'),
-            "createdAt"        => Carbon::parse($this->created_at)->format('d/m/Y'),
-            "assigner"         => $this->assigner_id,
-            "assigner_name"    => $this->assigner->name,
+            "startDate"        => $this->start_date,
+            "deadline"         => $this->due_date,
+            "createdAt"        => $this->created_at,
+            "assigner"         => $this->assigner,
             "mainHandler"      => $this->mainAssignee,
             "description"      => $this->description,
         ];

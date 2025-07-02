@@ -7,6 +7,8 @@ use App\Http\Resources\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\TaskRepository;
+use App\Http\Requests\Task\TaskStoreRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 
 class TaskController extends Controller
 {
@@ -42,64 +44,34 @@ class TaskController extends Controller
     //     return new TaskResource($task);
     // }
 
-    // public function store(Request $request)
-    // {
-    //     $data = $request->validate([
-    //         'content' => 'required|string',
-    //         'start_date' => 'required|date',
-    //         'due_date' => 'required|date',
-    //         'category_id' => 'required|exists:categories,id',
-    //         'weight' => 'nullable|integer|min:1|max:10',
-    //         'assigner_id' => 'required|exists:users,id',
-    //         'main_assignee_id' => 'required|exists:users,id',
-    //         'status' => 'nullable|in:pending,in_progress,completed,cancelled',
-    //         'created_by' => 'required|exists:users,id',
-    //         'collaborators' => 'nullable|array',
-    //         'collaborators.*' => 'exists:users,id',
-    //     ]);
-    //     DB::beginTransaction();
-    //     try {
-    //         $task = Task::create($data);
-    //         if (!empty($data['collaborators'])) {
-    //             $task->collaborators()->sync($data['collaborators']);
-    //         }
-    //         DB::commit();
-    //         return new TaskResource($task->load(['category', 'assigner', 'mainAssignee', 'collaborators']));
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return response()->json(['success' => false, 'message' => 'Lỗi tạo task', 'error' => $e->getMessage()], 500);
-    //     }
-    // }
+    public function store(TaskStoreRequest $request)
+    {
+        $task = $this->taskRepository->createTask($request->all());
+        if ($task) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Tạo task thành công',
+                'data' => new TaskResource($task),
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Tạo task thất bại',
+            ], 500);
+        }
+    }
 
-    // public function update(Request $request, $id)
-    // {
-    //     $task = Task::findOrFail($id);
-    //     $data = $request->validate([
-    //         'content' => 'required|string',
-    //         'start_date' => 'required|date',
-    //         'due_date' => 'required|date',
-    //         'category_id' => 'required|exists:categories,id',
-    //         'weight' => 'nullable|integer|min:1|max:10',
-    //         'assigner_id' => 'required|exists:users,id',
-    //         'main_assignee_id' => 'required|exists:users,id',
-    //         'status' => 'nullable|in:pending,in_progress,completed,cancelled',
-    //         'created_by' => 'required|exists:users,id',
-    //         'collaborators' => 'nullable|array',
-    //         'collaborators.*' => 'exists:users,id',
-    //     ]);
-    //     DB::beginTransaction();
-    //     try {
-    //         $task->update($data);
-    //         if (isset($data['collaborators'])) {
-    //             $task->collaborators()->sync($data['collaborators']);
-    //         }
-    //         DB::commit();
-    //         return new TaskResource($task->load(['category', 'assigner', 'mainAssignee', 'collaborators']));
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return response()->json(['success' => false, 'message' => 'Lỗi cập nhật task', 'error' => $e->getMessage()], 500);
-    //     }
-    // }
+    public function update(UpdateTaskRequest $request, $id)
+    {
+        $task = $this->taskRepository->updateTask($id, $request->all());
+        if ($task) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật task thành công',
+                'data' => new TaskResource($task),
+            ]);
+        }
+    }
 
     // public function destroy($id)
     // {
