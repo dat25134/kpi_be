@@ -13,7 +13,11 @@ class ActivityLogController extends Controller
         $query = Activity::query();
 
         if ($request->filled('causer_id')) {
-            $query->where('causer_id', $request->causer_id);
+            if ($request->causer_id == 'system') {
+                $query->where('causer_id', null);
+            } else {
+                $query->where('causer_id', $request->causer_id);
+            }
         }
         if ($request->filled('causer_type')) {
             $query->where('causer_type', $request->causer_type);
