@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Task extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'content',
         'start_date',
@@ -17,6 +20,25 @@ class Task extends Model
         'status',
         'created_by',
     ];
+
+    protected static $logAttributes = [
+        'content',
+        'start_date',
+        'due_date',
+        'category_id',
+        'weight',
+        'assigner_id',
+        'main_assignee_id',
+        'status',
+        'created_by',
+    ];
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(static::$logAttributes)
+            ->logOnlyDirty();
+    }
 
     public function category()
     {

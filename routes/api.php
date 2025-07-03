@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
@@ -89,4 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/sync-permission-by-employee', [PermissionController::class, 'syncPermissionByEmployee']);
         });
     });
+
+    Route::get('/activity-log', [ActivityLogController::class, 'index']);
 });

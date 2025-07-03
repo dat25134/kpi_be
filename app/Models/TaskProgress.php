@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class TaskProgress extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
     protected $table = 'task_progresses';
 
     protected $fillable = [
@@ -23,6 +24,14 @@ class TaskProgress extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected static $logAttributes = [
+        'task_id',
+        'user_id',
+        'content',
+        'created_at',
+        'updated_at'
+    ];
+
     public function task()
     {
         return $this->belongsTo(Task::class);
@@ -31,5 +40,12 @@ class TaskProgress extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(static::$logAttributes)
+            ->logOnlyDirty();
     }
 }
