@@ -21,7 +21,7 @@ class TaskProgressController extends Controller
         $progress = $this->taskProgressRepository->createProgress([
             'task_id' => $taskId,
             'user_id' => Auth::user()->id,
-            'content' => $request->content,
+            'content' => $request->contentProgress,
         ]);
         $progress->load('user');
         return response()->json([

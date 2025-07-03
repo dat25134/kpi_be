@@ -16,7 +16,7 @@ class TaskProgressResource extends JsonResource
                 'avatar' => $this->user->avatar ?? null,
             ],
             'time' => $this->created_at->toISOString(),
-            'content' => $this->content,
+            'contentProgress' => $this->content,
         ];
     }
 } 
