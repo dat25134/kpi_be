@@ -51,6 +51,9 @@ class ActivityLogController extends Controller
                     'totalPages' => $logs->lastPage(),
                     'totalItems' => $logs->total(),
                     'itemsPerPage' => $logs->perPage(),
+                    'create_count' => Activity::where('event', 'created')->count(),
+                    'update_count' => Activity::where('event', 'updated')->count(),
+                    'delete_count' => Activity::where('event', 'deleted')->count(),
                 ],
             ],
         ]);
