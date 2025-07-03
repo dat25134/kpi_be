@@ -26,6 +26,7 @@ class TaskResource extends JsonResource
             "assigner"         => $this->assigner,
             "mainHandler"      => $this->mainAssignee,
             "description"      => $this->description,
+            "progressHistory"  => TaskProgressResource::collection($this->whenLoaded('progressHistory')),
         ];
     }
 }

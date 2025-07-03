@@ -18,7 +18,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
 
     public function getTasksWithFilters(array $filters, int $limit = 10): LengthAwarePaginator
     {
-        $query = Task::with(['category', 'assigner', 'mainAssignee', 'collaborators']);
+        $query = Task::with(['category', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user']);
 
         if (isset($filters['startDate'])) {
             $query->whereDate('start_date', '>=', $filters['startDate']);

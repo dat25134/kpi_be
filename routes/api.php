@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskProgressController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -37,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [TaskController::class, 'store']);
             Route::put('/{id}', [TaskController::class, 'update']);
             // Route::delete('/{id}', [TaskController::class, 'destroy']);
+            
+            // Task Progress History
+            Route::post('/{taskId}/progress', [TaskProgressController::class, 'store']);
+            // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);
         });
     });
     // Admin
