@@ -86,6 +86,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'weight' => $data['count'],
             'main_assignee_id' => $data['mainHandler'],
             'assigner_id' => $data['assigner'],
+            'status' => $data['status'],
         ];
         $dataCollaborators = $data['assignees'];
         DB::beginTransaction();
