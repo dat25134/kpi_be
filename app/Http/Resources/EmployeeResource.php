@@ -52,6 +52,7 @@ class EmployeeResource extends JsonResource
                 'color' => optional($this->roles->first())->color,
             ],
             'permissions' => $this->getAllPermissions()->pluck('id'),
+            'employee_id' => $this->employee_id,
         ];
     }
 
