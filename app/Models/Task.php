@@ -37,4 +37,9 @@ class Task extends Model
     {
         return $this->belongsToMany(User::class, 'task_collaborators', 'task_id', 'user_id');
     }
+
+    public function progressHistory()
+    {
+        return $this->hasMany(TaskProgress::class)->orderBy('created_at', 'desc');
+    }
 } 

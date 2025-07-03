@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             CategorySeeder::class,
             TaskSeeder::class,
+            TaskProgressSeeder::class,
         ]);
     }
 }
