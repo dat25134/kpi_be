@@ -40,6 +40,6 @@ class Task extends Model
 
     public function progressHistory()
     {
-        return $this->hasMany(TaskProgress::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(TaskProgress::class)->orderBy('created_at', 'asc');
     }
 } 

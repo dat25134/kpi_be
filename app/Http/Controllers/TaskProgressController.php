@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\TaskProgressResource;
 use App\Http\Requests\TaskProgress\TaskProgressStoreRequest;
-use App\Repositories\Contracts\TaskProgressRepositoryInterface;
+use App\Repositories\TaskProgressRepository;
 use Illuminate\Support\Facades\Auth;
 
 class TaskProgressController extends Controller
 {
     protected $taskProgressRepository;
 
-    public function __construct(TaskProgressRepositoryInterface $taskProgressRepository)
+    public function __construct(TaskProgressRepository $taskProgressRepository)
     {
         $this->taskProgressRepository = $taskProgressRepository;
     }
