@@ -5,12 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
+        'name',
+        'code',
+        'description',
+        'status',
+    ];
+
+    protected static $logAttributes = [
         'name',
         'code',
         'description',
@@ -22,5 +30,12 @@ class Project extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('role', 'status')
             ->withTimestamps();
+    }
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(static::$logAttributes)
+            ->logOnlyDirty();
     }
 } 

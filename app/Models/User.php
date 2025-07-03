@@ -9,11 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +53,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         'join_date' => 'date',
         ];
+
+    protected static $logAttributes = [
+        'employee_id',
+        'name',
+        'email',
+        'phone',
+        'department_id',
+        'status',
+        'join_date',
+        'password',
+        'cccd',
+    ];
 
     /**
      * Get the user's department
@@ -106,5 +119,12 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class)
             ->withPivot('role', 'status')
             ->withTimestamps();
+    }
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(static::$logAttributes)
+            ->logOnlyDirty();
     }
 }

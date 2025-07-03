@@ -112,6 +112,19 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'activitylog' => [
+            'driver' => 'mysql',
+            'host' => env('ACTIVITY_LOG_DB_HOST', '127.0.0.1'),
+            'port' => env('ACTIVITY_LOG_DB_PORT', '3306'),
+            'database' => env('ACTIVITY_LOG_DB_DATABASE', 'activitylog'),
+            'username' => env('ACTIVITY_LOG_DB_USERNAME', 'root'),
+            'password' => env('ACTIVITY_LOG_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
     ],
 
     /*
