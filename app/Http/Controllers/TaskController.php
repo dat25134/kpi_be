@@ -23,6 +23,9 @@ class TaskController extends Controller
     {
         $tasks = $this->taskRepository->getTasksWithFilters($request->all());
 
+        // Lấy danh sách phòng ban có trong tasks của user hiện tại
+        $departments = $this->taskRepository->getUserTaskDepartments();
+        
         return response()->json([
             'success' => true, 
             'message' => 'Lấy danh sách công việc thành công',
@@ -34,6 +37,7 @@ class TaskController extends Controller
                     'totalItems' => $tasks->total(),
                     'itemsPerPage' => $tasks->perPage(),
                 ],
+                'departments' => $departments,
             ],
         ]);
     }

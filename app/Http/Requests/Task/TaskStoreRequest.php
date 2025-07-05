@@ -24,6 +24,7 @@ class TaskStoreRequest extends FormRequest
             'assignees' => 'nullable|array|bail',
             'assignees.*' => 'exists:users,id|bail',
             'category' => 'required|exists:categories,id|bail',
+            'department' => 'nullable|exists:departments,id|bail',
         ];
     }
 
@@ -48,6 +49,7 @@ class TaskStoreRequest extends FormRequest
             'assignees.exists' => 'Danh sách người tham gia không hợp lệ',
             'category.required' => 'Danh mục không được để trống',
             'category.exists' => 'Danh mục không hợp lệ',
+            'department.exists' => 'Phòng ban không hợp lệ',
         ];
     }
 } 

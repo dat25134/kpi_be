@@ -18,7 +18,17 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
 
     public function getTasksWithFilters(array $filters, int $limit = 10): LengthAwarePaginator
     {
-        $query = Task::with(['category', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user']);
+        $currentUserId = Auth::user()->id;
+        
+        $query = Task::with(['category', 'department', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user'])
+            ->where(function ($q) use ($currentUserId) {
+                $q->where('main_assignee_id', $currentUserId)
+                  ->orWhere('assigner_id', $currentUserId)
+                  ->orWhere('created_by', $currentUserId)
+                  ->orWhereHas('collaborators', function ($subQuery) use ($currentUserId) {
+                      $subQuery->where('user_id', $currentUserId);
+                  });
+            });
 
         if (isset($filters['startDate'])) {
             $query->whereDate('start_date', '>=', $filters['startDate']);
@@ -31,6 +41,10 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         if (isset($filters['category'])) {
             $query->where('category_id', $filters['category']);
         }   
+
+        if (isset($filters['departmentId'])) {
+            $query->where('department_id', $filters['departmentId']);
+        }
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -55,6 +69,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'start_date' =>  Carbon::parse($data['startDate'])->format('Y-m-d'),
             'due_date' => Carbon::parse($data['deadline'])->format('Y-m-d'),
             'category_id' => $data['category'],
+            'department_id' => $data['department'] ?? null,
             'weight' => $data['count'],
             'assigner_id' => $data['assigner'],
             'main_assignee_id' => $data['mainHandler'],
@@ -83,6 +98,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'start_date' =>  Carbon::parse($data['startDate'])->format('Y-m-d'),
             'due_date' => Carbon::parse($data['deadline'])->format('Y-m-d'),
             'category_id' => $data['category'],
+            'department_id' => $data['department'] ?? null,
             'weight' => $data['count'],
             'main_assignee_id' => $data['mainHandler'],
             'assigner_id' => $data['assigner'],
@@ -99,5 +115,86 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             DB::rollBack();
             return false;
         }
+    }
+
+    /**
+     * Lấy thống kê task của user hiện tại
+     */
+    public function getUserTaskStats(): array
+    {
+        $currentUserId = Auth::user()->id;
+        
+        // Tổng số task liên quan
+        $totalTasks = Task::where(function ($q) use ($currentUserId) {
+            $q->where('main_assignee_id', $currentUserId)
+              ->orWhere('assigner_id', $currentUserId)
+              ->orWhere('created_by', $currentUserId)
+              ->orWhereHas('collaborators', function ($subQuery) use ($currentUserId) {
+                  $subQuery->where('user_id', $currentUserId);
+              });
+        })->count();
+
+        // Task theo trạng thái
+        $statusStats = Task::where(function ($q) use ($currentUserId) {
+            $q->where('main_assignee_id', $currentUserId)
+              ->orWhere('assigner_id', $currentUserId)
+              ->orWhere('created_by', $currentUserId)
+              ->orWhereHas('collaborators', function ($subQuery) use ($currentUserId) {
+                  $subQuery->where('user_id', $currentUserId);
+              });
+        })
+        ->selectRaw('status, COUNT(*) as count')
+        ->groupBy('status')
+        ->pluck('count', 'status')
+        ->toArray();
+
+        // Task theo vai trò
+        $roleStats = [
+            'main_assignee' => Task::where('main_assignee_id', $currentUserId)->count(),
+            'assigner' => Task::where('assigner_id', $currentUserId)->count(),
+            'creator' => Task::where('created_by', $currentUserId)->count(),
+            'collaborator' => Task::whereHas('collaborators', function ($q) use ($currentUserId) {
+                $q->where('user_id', $currentUserId);
+            })->count(),
+        ];
+
+        return [
+            'total_tasks' => $totalTasks,
+            'status_stats' => $statusStats,
+            'role_stats' => $roleStats,
+        ];
+    }
+
+    /**
+     * Lấy danh sách phòng ban có trong tasks của user hiện tại
+     */
+    public function getUserTaskDepartments(): array
+    {
+        $currentUserId = Auth::user()->id;
+        
+        $departments = Task::where(function ($q) use ($currentUserId) {
+            $q->where('main_assignee_id', $currentUserId)
+              ->orWhere('assigner_id', $currentUserId)
+              ->orWhere('created_by', $currentUserId)
+              ->orWhereHas('collaborators', function ($subQuery) use ($currentUserId) {
+                  $subQuery->where('user_id', $currentUserId);
+              });
+        })
+        ->whereNotNull('department_id')
+        ->with('department:id,name,code')
+        ->get()
+        ->pluck('department')
+        ->unique('id')
+        ->values()
+        ->map(function ($department) {
+            return [
+                'id' => $department->id,
+                'name' => $department->name,
+                'code' => $department->code,
+            ];
+        })
+        ->toArray();
+
+        return $departments;
     }
 }
