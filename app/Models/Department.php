@@ -29,6 +29,11 @@ class Department extends Model
         return $this->hasMany(User::class, 'department_id');
     }
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'department_id');
+    }
+
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return \Spatie\Activitylog\LogOptions::defaults()

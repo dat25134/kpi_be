@@ -34,6 +34,7 @@ class TaskSeeder extends Seeder
                 'start_date' => now()->subDays($i)->toDateString(),
                 'due_date' => now()->addDays($i + 7)->toDateString(),
                 'category_id' => $category->id,
+                'department_id' => $mainAssignee->department_id, // Gán phòng ban theo người chịu trách nhiệm chính
                 'weight' => rand(1, 5),
                 'assigner_id' => $assigner->id,
                 'main_assignee_id' => $mainAssignee->id,

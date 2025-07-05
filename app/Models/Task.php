@@ -14,6 +14,7 @@ class Task extends Model
         'start_date',
         'due_date',
         'category_id',
+        'department_id',
         'weight',
         'assigner_id',
         'main_assignee_id',
@@ -26,6 +27,7 @@ class Task extends Model
         'start_date',
         'due_date',
         'category_id',
+        'department_id',
         'weight',
         'assigner_id',
         'main_assignee_id',
@@ -43,6 +45,11 @@ class Task extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function assigner()
