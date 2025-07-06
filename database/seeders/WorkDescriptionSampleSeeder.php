@@ -131,7 +131,7 @@ class WorkDescriptionSampleSeeder extends Seeder
     private function calculateResultScore($status, $qualityWeight)
     {
         $resultLevel = $this->getResultLevelFromTaskStatus($status);
-        return $resultLevel * $qualityWeight;
+        return $resultLevel * $qualityWeight / 5;
     }
 
     /**
