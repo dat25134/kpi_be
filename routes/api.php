@@ -92,4 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/activity-log', [ActivityLogController::class, 'index']);
+    Route::get('/evaluations', [\App\Http\Controllers\EvaluationController::class, 'index']);
+    Route::get('/evaluations/{id}', [\App\Http\Controllers\EvaluationController::class, 'show']);
 });

@@ -71,4 +71,6 @@ class Task extends Model
     {
         return $this->hasMany(TaskProgress::class)->orderBy('created_at', 'asc');
     }
+
+
 } 
