@@ -10,6 +10,9 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Models\Task;
+use App\Models\Evaluation;
+use App\Models\Department;
 
 class User extends Authenticatable
 {
@@ -82,37 +85,53 @@ class User extends Authenticatable
         return $this->hasOne(UserInfo::class);
     }
 
-    // /**
-    //  * Get the tasks created by the user
-    //  */
-    // public function createdTasks()
-    // {
-    //     return $this->hasMany(Task::class, 'created_by');
-    // }
+    /**
+     * Get the tasks created by the user
+     */
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by');
+    }
 
-    // /**
-    //  * Get the tasks assigned to the user
-    //  */
-    // public function assignedTasks()
-    // {
-    //     return $this->hasMany(Task::class, 'assigned_to');
-    // }
+    /**
+     * Get the tasks assigned to the user (main assignee)
+     */
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'main_assignee_id');
+    }
 
-    // /**
-    //  * Get the evaluations of the user
-    //  */
-    // public function evaluations()
-    // {
-    //     return $this->hasMany(Evaluation::class);
-    // }
+    /**
+     * Get the tasks assigned by the user (assigner)
+     */
+    public function assignedByTasks()
+    {
+        return $this->hasMany(Task::class, 'assigner_id');
+    }
 
-    // /**
-    //  * Get the department managed by the user
-    //  */
-    // public function managedDepartment()
-    // {
-    //     return $this->hasOne(Department::class, 'manager_id');
-    // }
+    /**
+     * Get the tasks where user is a collaborator
+     */
+    public function collaboratedTasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_collaborators', 'user_id', 'task_id');
+    }
+
+    /**
+     * Get the evaluations of the user
+     */
+    public function evaluations()
+    {
+        return $this->hasMany(Evaluation::class);
+    }
+
+    /**
+     * Get the department managed by the user
+     */
+    public function managedDepartment()
+    {
+        return $this->hasOne(Department::class, 'manager_id');
+    }
 
     public function projects()
     {

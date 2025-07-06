@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             TaskSeeder::class,
             TaskProgressSeeder::class,
+            EvaluationCriteriaSeeder::class,
+            EvaluationSampleSeeder::class,
+            WorkDescriptionSampleSeeder::class,
         ]);
     }
 }

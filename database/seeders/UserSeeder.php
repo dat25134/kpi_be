@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,7 +17,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('vi_VN');
-
+        $roleData = Role::all()->pluck('name')->toArray();
         // Tạo Admin
         $admin = User::create([
             'employee_id' => 'EMP001',
@@ -34,7 +35,7 @@ class UserSeeder extends Seeder
         $departments = range(1, 20); // Có 20 departments từ seeder
 
         for ($i = 3; $i <= 32; $i++) {
-            $role = $faker->randomElement(['nhanvien', 'chuyenvien', 'truongphong', 'thuctapsinh']);
+            $role = $faker->randomElement($roleData);
             $status = $faker->randomElement($statuses);
             $departmentId = $faker->randomElement($departments);
             
