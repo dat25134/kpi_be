@@ -17,15 +17,7 @@ class EvaluationController extends Controller
      */
     public function index(Request $request)
     {
-        // Mapping type sang role
-        $typeMap = [
-            'employee' => 'nhanvien',
-            'staff' => 'chuyenvien',
-            'deputy' => 'phophong',
-            'head' => 'truongphong',
-            'personal' => 'personal',
-        ];
-        $roleType = $typeMap[$request->input('type')] ?? null;
+        $roleType = $request->input('type') ?? null;
         if (!$roleType) {
             return response()->json(['message' => 'Tham số type không hợp lệ'], 422);
         }
@@ -56,27 +48,15 @@ class EvaluationController extends Controller
         }
 
         // Lọc theo xếp loại
-        if ($request->filled('rating')) {
-            $ratingMap = [
-                'excellent' => 'A',
-                'good' => 'B',
-                'achieved' => 'C',
-                'not_achieved' => 'D',
-            ];
-            $grade = $ratingMap[$request->input('rating')] ?? null;
-            if ($grade) {
-                $query->where('final_grade', $grade);
-            }
+        if ($request->filled('final_grade')) {
+            $query->where('final_grade', $request->input('final_grade'));
         }
 
         // Lọc theo period (tháng/năm)
-        if ($request->filled('period')) {
-            $period = $request->input('period');
-            if (preg_match('/^(\d{1,2})\/(\d{4})$/', $period, $matches)) {
-                $month = (int)$matches[1];
-                $year = (int)$matches[2];
-                $query->where('month', $month)->where('year', $year);
-            }
+        if ($request->filled('month') && $request->filled('year')) {
+            $month = $request->input('month');
+            $year = $request->input('year');
+            $query->where('month', $month)->where('year', $year);
         }
 
         // Phân trang

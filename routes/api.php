@@ -28,11 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [CategoryController::class, 'index']);
         });
 
-        // Employee
-        Route::prefix('employees')->group(function () {
-            Route::get('/all-employees', [EmployeeController::class, 'allEmployees']);
-        });
-
         //Task
         Route::prefix('tasks')->group(function () {
             Route::get('/', [TaskController::class, 'index']);
@@ -44,13 +39,16 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{taskId}/progress', [TaskProgressController::class, 'store']);
             // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);
         });
+
+        // Selection
+        Route::get('departments/select', [DepartmentController::class, 'select']);
+        Route::get('employees/all-employees', [EmployeeController::class, 'allEmployees']);
     });
     // Admin
     Route::middleware('role:admin')->group(function () {
 
         // Department
         Route::group(['prefix' => 'departments'], function () {
-            Route::get('/select', [DepartmentController::class, 'select']);
             Route::get('/', [DepartmentController::class, 'departments']);
             Route::get('/summary', [DepartmentController::class, 'summary']);
             Route::get('/{id}', [DepartmentController::class, 'details']);
