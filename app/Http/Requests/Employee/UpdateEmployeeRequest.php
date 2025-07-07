@@ -21,13 +21,14 @@ class UpdateEmployeeRequest extends FormRequest
             'departmentId' => 'required|integer|exists:departments,id',
             'salary' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
-            'birthDate' => 'nullable|date_format:d/m/Y',
+            'birthDate' => 'nullable|date|date_format:Y-m-d',
             'gender' => 'nullable|string|in:male,female,other',
             'education' => 'nullable|string',
             'experience' => 'nullable|string',
             'skills' => 'nullable|array',
             'roleName' => 'required|string|exists:roles,name',
             'cccd' => 'nullable|string|max:20|unique:users,cccd,' . $userId,
+            'joinDate' => 'nullable|date|date_format:Y-m-d',
         ];
     }
 
@@ -49,7 +50,8 @@ class UpdateEmployeeRequest extends FormRequest
             'salary.numeric' => 'Lương phải là số.',
             'salary.min' => 'Lương không được âm.',
             'address.string' => 'Địa chỉ phải là chuỗi ký tự.',
-            'birthDate.date_format' => 'Ngày sinh phải có định dạng d/m/Y.',
+            'birthDate.date' => 'Ngày sinh phải là ngày.',
+            'birthDate.date_format' => 'Ngày sinh phải có định dạng Y-m-d.',
             'gender.in' => 'Giới tính phải là male, female hoặc other.',
             'education.string' => 'Học vấn phải là chuỗi ký tự.',
             'experience.string' => 'Kinh nghiệm phải là chuỗi ký tự.',
@@ -60,6 +62,8 @@ class UpdateEmployeeRequest extends FormRequest
             'cccd.string' => 'CCCD phải là chuỗi ký tự.',
             'cccd.max' => 'CCCD không được vượt quá 20 ký tự.',
             'cccd.unique' => 'CCCD đã tồn tại.',
+            'joinDate.date' => 'Ngày tham gia phải là ngày.',
+            'joinDate.date_format' => 'Ngày tham gia phải có định dạng Y-m-d.',
         ];
     }
 } 

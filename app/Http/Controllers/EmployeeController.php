@@ -68,7 +68,7 @@ class EmployeeController extends Controller
                 'totalEmployees' => $stats['totalEmployees'],
                 'activeEmployees' => $stats['activeEmployees'],
                 'inactiveEmployees' => $stats['inactiveEmployees'],
-                'averageSalary' => $stats['averageSalary'] !== null ? round($stats['averageSalary']) : 0,
+                'joinedThisMonth' => $stats['joinedThisMonth'],
                 'departmentStats' => $stats['departmentStats'],
                 'roleStats' => $stats['roleStats'],
             ],
@@ -77,7 +77,7 @@ class EmployeeController extends Controller
 
     public function store(StoreEmployeeRequest $request)
     {
-        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId', 'roleName');
+        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId', 'roleName', 'joinDate');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->createEmployee($userData, $userInfoData);
         if ($result) {
@@ -96,7 +96,7 @@ class EmployeeController extends Controller
 
     public function update(UpdateEmployeeRequest $request, $id)
     {
-        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId','roleName');
+        $userData = $request->only('name', 'email', 'phone', 'cccd', 'departmentId','roleName', 'joinDate');
         $userInfoData = $request->only('salary', 'address', 'birthDate', 'gender', 'education', 'experience', 'skills');
         $result = $this->userRepository->updateEmployee($id, $userData, $userInfoData);
 

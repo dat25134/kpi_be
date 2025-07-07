@@ -57,10 +57,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         $totalEmployees = $this->model->count();
         $activeEmployees = $this->model->where('status', 'active')->count();
         $inactiveEmployees = $totalEmployees - $activeEmployees;
-        
-        $averageSalary = UserInfo::join('users', 'user_info.user_id', '=', 'users.id')
-            ->whereNull('users.deleted_at')
-            ->avg('user_info.salary');
+        $joinedThisMonth = $this->model->whereMonth('join_date', now()->month)->count();
 
         $departmentStats = DB::table('departments')
             ->leftJoin('users', 'departments.id', '=', 'users.department_id')
@@ -92,7 +89,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             'totalEmployees' => $totalEmployees,
             'activeEmployees' => $activeEmployees,
             'inactiveEmployees' => $inactiveEmployees,
-            'averageSalary' => $averageSalary !== null ? round($averageSalary) : 0,
+            'joinedThisMonth' => $joinedThisMonth ?? 0,
             'departmentStats' => $departmentStats,
             'roleStats' => $roleStats,
         ];
@@ -112,7 +109,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'password' => Hash::make('password'), // Mật khẩu mặc định
                 'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
                 'status' => 'active',
-                'join_date' => now(),
+                'join_date' => isset($userData['joinDate']) ? Carbon::createFromFormat('Y-m-d', $userData['joinDate'])->format('Y-m-d') : null,
             ]);
             $user->syncRoles([$userData['roleName']]);
 
@@ -121,7 +118,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'user_id' => $user->id,
                 'salary' => $userInfoData['salary'] ?? null,
                 'address' => $userInfoData['address'] ?? null,
-                'birth_date' => isset($userInfoData['birthDate']) ? Carbon::createFromFormat('d/m/Y', $userInfoData['birthDate'])->format('Y-m-d') : null,
+                'birth_date' => isset($userInfoData['birthDate']) ? Carbon::createFromFormat('Y-m-d', $userInfoData['birthDate'])->format('Y-m-d') : null,
                 'gender' => $userInfoData['gender'] ?? null,
                 'education' => $userInfoData['education'] ?? null,
                 'experience' => $userInfoData['experience'] ?? null,
@@ -151,6 +148,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'phone' => $userData['phone'] ?? null,
                 'department_id' => $userData['departmentId'],
                 'cccd' => $userData['cccd'] ?? null,
+                'join_date' => isset($userData['joinDate']) ? Carbon::createFromFormat('Y-m-d', $userData['joinDate'])->format('Y-m-d') : null,
             ]);
             $user->syncRoles([$userData['roleName']]);
 
@@ -158,7 +156,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             $user->info->update([
                 'salary' => $userInfoData['salary'] ?? null,
                 'address' => $userInfoData['address'] ?? null,
-                'birth_date' => isset($userInfoData['birthDate']) ? Carbon::createFromFormat('d/m/Y', $userInfoData['birthDate'])->format('Y-m-d') : null,
+                'birth_date' => isset($userInfoData['birthDate']) ? Carbon::createFromFormat('Y-m-d', $userInfoData['birthDate'])->format('Y-m-d') : null,
                 'gender' => $userInfoData['gender'] ?? null,
                 'education' => $userInfoData['education'] ?? null,
                 'experience' => $userInfoData['experience'] ?? null,
