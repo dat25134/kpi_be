@@ -3,86 +3,74 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Evaluation;
-use App\Models\User;
-use Illuminate\Support\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Services\EvaluationService;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\EvaluationResource;
 
 class EvaluationController extends Controller
 {
+    protected $evaluationService;
+
+    public function __construct(EvaluationService $evaluationService)
+    {
+        $this->evaluationService = $evaluationService;
+    }
+
     /**
      * Lấy danh sách phiếu đánh giá với filter
      */
     public function index(Request $request)
     {
-        $roleType = $request->input('type') ?? null;
-        if (!$roleType) {
-            return response()->json(['message' => 'Tham số type không hợp lệ'], 422);
-        }
-
         $isAdmin = $request->user()->hasRole('admin');
-        $query = Evaluation::query()->with(['user.roles', 'user.department']);
-
-        // Nếu không phải admin thì filter theo type/role như cũ
-        if (!$isAdmin) {
-            if ($roleType !== 'personal') {
-                $query->whereHas('user.roles', function ($q) use ($roleType) {
-                    $q->where('name', $roleType);
-                });
-            } else {
-                $query->where('user_id', Auth::id());
-            }
-        }
-
-        // Lọc theo tên
-        if ($request->filled('name')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->input('name') . '%');
-            });
-        }
-        // Lọc theo trạng thái
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        // Lọc theo xếp loại
-        if ($request->filled('final_grade')) {
-            $query->where('final_grade', $request->input('final_grade'));
-        }
-
-        // Lọc theo period (tháng/năm)
-        if ($request->filled('month') && $request->filled('year')) {
-            $month = $request->input('month');
-            $year = $request->input('year');
-            $query->where('month', $month)->where('year', $year);
-        }
-
-        // Phân trang
-        $page = (int)($request->input('page', 1));
-        $pageSize = (int)($request->input('pageSize', 10));
-        $evaluations = $query->orderByDesc('year')->orderByDesc('month')->paginate($pageSize, ['*'], 'page', $page);
-
-        // Định dạng dữ liệu trả về bằng resource
-        $data = EvaluationResource::collection($evaluations->getCollection());
-
-        return response()->json([
-            'message' => 'Lấy danh sách phiếu đánh giá thành công',
-            'data' => $data,
-            'pagination' => [
-                'currentPage'  => $evaluations->currentPage(),
-                'totalPages'   => $evaluations->lastPage(),
-                'totalItems'   => $evaluations->total(),
-                'itemsPerPage' => $evaluations->perPage(),
-            ],
-        ]);
+        return $this->evaluationService->getEvaluationsWithFilters($request, $isAdmin);
     }
 
+    /**
+     * Lấy chi tiết phiếu đánh giá
+     */
     public function show($id)
     {
-        $evaluation = \App\Models\Evaluation::with(['user.roles', 'user.department', 'evaluationDetails.criteria', 'workDescriptions'])
-            ->findOrFail($id);
-        return new \App\Http\Resources\EvaluationResource($evaluation);
+        return $this->evaluationService->getEvaluationById((int) $id);
+    }
+
+    /**
+     * Tạo phiếu đánh giá mới
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'department_id' => 'required|exists:departments,id',
+            'month' => 'required|integer|between:1,12',
+            'year' => 'required|integer|min:2020',
+            'status' => 'required|in:draft,submitted,approved,rejected',
+        ]);
+
+        return $this->evaluationService->createEvaluation($validated);
+    }
+
+    /**
+     * Cập nhật phiếu đánh giá
+     */
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'user_id' => 'sometimes|exists:users,id',
+            'department_id' => 'sometimes|exists:departments,id',
+            'month' => 'sometimes|integer|between:1,12',
+            'year' => 'sometimes|integer|min:2020',
+            'status' => 'sometimes|in:draft,submitted,approved,rejected',
+            'total_score' => 'sometimes|numeric|min:0',
+            'final_grade' => 'sometimes|in:A,B,C,D',
+        ]);
+
+        return $this->evaluationService->updateEvaluation((int) $id, $validated);
+    }
+
+    /**
+     * Xóa phiếu đánh giá
+     */
+    public function destroy($id)
+    {
+        return $this->evaluationService->deleteEvaluation((int) $id);
     }
 } 
