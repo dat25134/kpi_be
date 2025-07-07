@@ -82,6 +82,12 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         try {
             $task = $this->create($dataTaskCreate);
             $task->collaborators()->sync($dataCollaborators);
+            // Xử lý upload file
+            if (request()->hasFile('files')) {
+                foreach (request()->file('files') as $file) {
+                    $task->addMedia($file)->toMediaCollection('task_files');
+                }
+            }
             DB::commit();
             return $task;
         } catch (\Exception $e) {
@@ -109,6 +115,12 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         try {
             $task->update($dataUpdate);
             $task->collaborators()->sync($dataCollaborators);
+            // Xử lý upload file (nếu có)
+            if (request()->hasFile('files')) {
+                foreach (request()->file('files') as $file) {
+                    $task->addMedia($file)->toMediaCollection('task_files');
+                }
+            }
             DB::commit();
             return $task;
         } catch (\Exception $e) {

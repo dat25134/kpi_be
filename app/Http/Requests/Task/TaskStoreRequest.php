@@ -25,6 +25,8 @@ class TaskStoreRequest extends FormRequest
             'assignees.*' => 'exists:users,id|bail',
             'category' => 'required|exists:categories,id|bail',
             'department' => 'nullable|exists:departments,id|bail',
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:10240', // 10MB mỗi file
         ];
     }
 
@@ -50,6 +52,9 @@ class TaskStoreRequest extends FormRequest
             'category.required' => 'Danh mục không được để trống',
             'category.exists' => 'Danh mục không hợp lệ',
             'department.exists' => 'Phòng ban không hợp lệ',
+            'files.array' => 'Danh sách file không hợp lệ',
+            'files.*.file' => 'File không hợp lệ',
+            'files.*.max' => 'File không được lớn hơn 10MB',
         ];
     }
 } 
