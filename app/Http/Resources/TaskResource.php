@@ -37,6 +37,15 @@ class TaskResource extends JsonResource
             "mainHandler"      => $this->mainAssignee,
             "description"      => $this->description,
             "progressHistory"  => TaskProgressResource::collection($this->whenLoaded('progressHistory')),
+            "files" => $this->getMedia('task_files')->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'name' => $media->file_name,
+                    'url' => $media->getUrl(),
+                    'size' => $media->size,
+                    'mime_type' => $media->mime_type,
+                ];
+            }),
         ];
     }
 

@@ -26,6 +26,8 @@ class UpdateTaskRequest extends FormRequest
             'status' => 'nullable|in:pending,in_progress,completed,cancelled',
             'assignees' => 'nullable|array',
             'assignees.*' => 'exists:users,id',
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:10240', // 10MB mỗi file
         ];
     }
 
@@ -52,6 +54,9 @@ class UpdateTaskRequest extends FormRequest
             'status.in' => 'Trạng thái không hợp lệ',
             'assignees.array' => 'Danh sách người tham gia không hợp lệ',
             'assignees.*.exists' => 'Người tham gia không hợp lệ',
+            'files.array' => 'Danh sách file không hợp lệ',
+            'files.*.file' => 'File không hợp lệ',
+            'files.*.max' => 'File không được vượt quá 10MB',
         ];
     }
 } 
