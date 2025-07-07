@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
@@ -43,7 +44,18 @@ Route::middleware('auth:sanctum')->group(function () {
         // Selection
         Route::get('departments/select', [DepartmentController::class, 'select']);
         Route::get('employees/all-employees', [EmployeeController::class, 'allEmployees']);
+        Route::get('/activity-log', [ActivityLogController::class, 'index']);
+
+        Route::group(['prefix' => 'evaluations'], function () {
+            Route::get('/', [EvaluationController::class, 'index']);
+            Route::get('/{id}', [EvaluationController::class, 'show']);
+        });
     });
+
+
+
+
+
     // Admin
     Route::middleware('role:admin')->group(function () {
 
@@ -88,8 +100,4 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/sync-permission-by-employee', [PermissionController::class, 'syncPermissionByEmployee']);
         });
     });
-
-    Route::get('/activity-log', [ActivityLogController::class, 'index']);
-    Route::get('/evaluations', [\App\Http\Controllers\EvaluationController::class, 'index']);
-    Route::get('/evaluations/{id}', [\App\Http\Controllers\EvaluationController::class, 'show']);
 });

@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\TaskProgressRepositoryInterface;
-use App\Repositories\TaskProgressRepository;
+use App\Repositories\Interfaces\EvaluationRepositoryInterface;
+use App\Repositories\EvaluationRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(TaskProgressRepositoryInterface::class, TaskProgressRepository::class);
+        // Bind repository interface to concrete implementation
+        $this->app->bind(EvaluationRepositoryInterface::class, EvaluationRepository::class);
     }
 
     /**
