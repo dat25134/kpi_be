@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
             
             // Task Progress History
             Route::post('/{taskId}/progress', [TaskProgressController::class, 'store']);
+            Route::delete('/{taskId}/files/{id}', [TaskController::class, 'deleteFile']);
             // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);
         });
 

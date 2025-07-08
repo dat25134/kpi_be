@@ -84,4 +84,11 @@ class TaskController extends Controller
     //     $task->delete();
     //     return response()->json(['success' => true, 'message' => 'Xóa task thành công']);
     // }
+
+    public function deleteFile($taskId, $id)
+    {
+        $task = Task::findOrFail($taskId);
+        $task->deleteMedia($id);
+        return response()->json(['success' => true, 'message' => 'Xóa file thành công']);
+    }
 } 
