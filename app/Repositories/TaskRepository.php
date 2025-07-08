@@ -111,10 +111,19 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'status' => $data['status'],
         ];
         $dataCollaborators = $data['assignees'];
+        $updateReason = $data['changeReason'] ?? 'Cập nhật task';
+        
         DB::beginTransaction();
         try {
             $task->update($dataUpdate);
             $task->collaborators()->sync($dataCollaborators);
+            
+            // Lưu lý do cập nhật vào task progress
+            $task->progressHistory()->create([
+                'user_id' => Auth::user()->id,
+                'content' => "Cập nhật task - Lý do: {$updateReason}",
+            ]);
+            
             // Xử lý upload file (nếu có)
             if (request()->hasFile('files')) {
                 foreach (request()->file('files') as $file) {

@@ -28,6 +28,7 @@ class UpdateTaskRequest extends FormRequest
             'assignees.*' => 'exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240', // 10MB mỗi file
+            'changeReason' => 'required|string|min:10|max:500',
         ];
     }
 
@@ -57,6 +58,10 @@ class UpdateTaskRequest extends FormRequest
             'files.array' => 'Danh sách file không hợp lệ',
             'files.*.file' => 'File không hợp lệ',
             'files.*.max' => 'File không được vượt quá 10MB',
+            'changeReason.required' => 'Lý do cập nhật không được để trống',
+            'changeReason.string' => 'Lý do cập nhật không hợp lệ',
+            'changeReason.min' => 'Lý do cập nhật phải có ít nhất 10 ký tự',
+            'changeReason.max' => 'Lý do cập nhật không được vượt quá 500 ký tự',
         ];
     }
 } 
