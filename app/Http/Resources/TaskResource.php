@@ -46,6 +46,24 @@ class TaskResource extends JsonResource
                     'mime_type' => $media->mime_type,
                 ];
             }),
+            "subtasks" => $this->subtasks->map(function ($subtask) {
+                return [
+                    'id' => $subtask->id,
+                    'status' => $subtask->status,
+                    'content' => $subtask->content,
+                    'startDate' => $subtask->start_date,
+                    'deadline' => $subtask->due_date,
+                    'mainHandler' => $subtask->mainAssignee,
+                    'assignees' => $subtask->collaborators->map(function ($collaborator) {
+                        return [
+                            'id' => $collaborator->id,
+                            'name' => $collaborator->name,
+                        ];
+                    }),
+                    'count' => $subtask->weight,
+                    'createdAt' => $subtask->created_at,
+                ];
+            }),
         ];
     }
 

@@ -22,12 +22,20 @@ class TaskSeeder extends Seeder
 
         $numTasks = 50; // Số lượng task để test phân trang
 
+        $taskIds = [];
         for ($i = 1; $i <= $numTasks; $i++) {
             // Random assigner, main assignee, collaborators
             $assigner = $users->random();
             $mainAssignee = $users->where('id', '!=', $assigner->id)->random();
             $collaborators = $users->whereNotIn('id', [$assigner->id, $mainAssignee->id])->random(2)->pluck('id')->toArray();
             $category = $categories->random();
+
+            // 70% task là gốc, 30% là subtask
+            $parentId = null;
+            if ($i > 1 && rand(1, 100) <= 30) {
+                // Chọn ngẫu nhiên 1 task đã tạo trước đó làm cha
+                $parentId = collect($taskIds)->random();
+            }
 
             $task = Task::create([
                 'content' => "Task $i: Nội dung công việc mẫu để test phân trang.",
@@ -40,7 +48,10 @@ class TaskSeeder extends Seeder
                 'main_assignee_id' => $mainAssignee->id,
                 'status' => collect(['pending', 'in_progress', 'completed', 'cancelled'])->random(),
                 'created_by' => $assigner->id,
+                'parent_id' => $parentId,
             ]);
+
+            $taskIds[] = $task->id;
 
             foreach ($collaborators as $userId) {
                 DB::table('task_collaborators')->insert([

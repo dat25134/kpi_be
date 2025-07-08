@@ -47,7 +47,11 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         }
 
         if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
+            if ($filters['status'] == 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $filters['status']);
+            }
         }
 
         if (isset($filters['search'])) {
@@ -75,6 +79,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'main_assignee_id' => $data['mainHandler'],
             'status' => 'in_progress',
             'created_by' => Auth::user()->id,
+            'parent_id' => $data['parent_id'] ?? null,
         ];
         $dataCollaborators = $data['assignees'];
 

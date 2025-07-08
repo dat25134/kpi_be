@@ -27,6 +27,7 @@ class TaskStoreRequest extends FormRequest
             'department' => 'nullable|exists:departments,id|bail',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240', // 10MB mỗi file
+            'parent_id' => 'nullable|exists:tasks,id',
         ];
     }
 
@@ -55,6 +56,7 @@ class TaskStoreRequest extends FormRequest
             'files.array' => 'Danh sách file không hợp lệ',
             'files.*.file' => 'File không hợp lệ',
             'files.*.max' => 'File không được lớn hơn 10MB',
+            'parent_id.exists' => 'Task cha không hợp lệ',
         ];
     }
 } 
