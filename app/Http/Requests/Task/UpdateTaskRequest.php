@@ -14,7 +14,7 @@ class UpdateTaskRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'content' => 'sometimes|required|string',
             'startDate' => 'sometimes|required|date',
             'deadline' => 'sometimes|required|date',
@@ -30,6 +30,30 @@ class UpdateTaskRequest extends FormRequest
             'files.*' => 'file|max:10240', // 10MB mỗi file
             'changeReason' => 'required|string|min:10|max:500',
         ];
+        if ($this->input('status') === 'completed') {
+            $rules['qualityWeight'] = 'required|in:1,2,3,4';
+        }
+        return $rules;
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $parentId = $this->input('parent_id');
+            if ($parentId) {
+                $parent = \App\Models\Task::find($parentId);
+                if ($parent) {
+                    $startDate = $this->input('startDate');
+                    $deadline = $this->input('deadline');
+                    if ($startDate && ($startDate < $parent->start_date)) {
+                        $validator->errors()->add('startDate', 'Ngày bắt đầu của task con không được nhỏ hơn ngày bắt đầu của task cha ('.$parent->start_date.')');
+                    }
+                    if ($deadline && ($deadline > $parent->due_date)) {
+                        $validator->errors()->add('deadline', 'Hạn xử lý của task con không được lớn hơn hạn xử lý của task cha ('.$parent->due_date.')');
+                    }
+                }
+            }
+        });
     }
 
     public function messages()
@@ -62,6 +86,8 @@ class UpdateTaskRequest extends FormRequest
             'changeReason.string' => 'Lý do cập nhật không hợp lệ',
             'changeReason.min' => 'Lý do cập nhật phải có ít nhất 10 ký tự',
             'changeReason.max' => 'Lý do cập nhật không được vượt quá 500 ký tự',
+            'qualityWeight.required' => 'Vui lòng nhập trọng số chất lượng khi hoàn thành task',
+            'qualityWeight.in' => 'Trọng số chất lượng chỉ nhận giá trị 1, 2, 3 hoặc 4',
         ];
     }
 } 

@@ -18,10 +18,12 @@ class Task extends Model implements HasMedia
         'category_id',
         'department_id',
         'weight',
+        'quality_weight',
         'assigner_id',
         'main_assignee_id',
         'status',
         'created_by',
+        'parent_id',
     ];
 
     protected static $logAttributes = [
@@ -74,5 +76,14 @@ class Task extends Model implements HasMedia
         return $this->hasMany(TaskProgress::class)->orderBy('created_at', 'asc');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(Task::class, 'parent_id');
+    }
+
+    public function subtasks()
+    {
+        return $this->hasMany(Task::class, 'parent_id');
+    }
 
 } 

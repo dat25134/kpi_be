@@ -30,6 +30,7 @@ class TaskResource extends JsonResource
                 ];
             }),
             "count"            => $this->weight,
+            "qualityWeight"    => $this->quality_weight,
             "startDate"        => $this->start_date,
             "deadline"         => $this->due_date,
             "createdAt"        => $this->created_at,
@@ -44,6 +45,25 @@ class TaskResource extends JsonResource
                     'url' => $media->getUrl(),
                     'size' => $media->size,
                     'mime_type' => $media->mime_type,
+                ];
+            }),
+            "subtasks" => $this->subtasks->map(function ($subtask) {
+                return [
+                    'id' => $subtask->id,
+                    'status' => $subtask->status,
+                    'content' => $subtask->content,
+                    'startDate' => $subtask->start_date,
+                    'deadline' => $subtask->due_date,
+                    'mainHandler' => $subtask->mainAssignee,
+                    'assignees' => $subtask->collaborators->map(function ($collaborator) {
+                        return [
+                            'id' => $collaborator->id,
+                            'name' => $collaborator->name,
+                        ];
+                    }),
+                    'count' => $subtask->weight,
+                    'qualityWeight' => $subtask->quality_weight,
+                    'createdAt' => $subtask->created_at,
                 ];
             }),
         ];

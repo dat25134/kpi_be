@@ -47,7 +47,11 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         }
 
         if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
+            if ($filters['status'] == 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $filters['status']);
+            }
         }
 
         if (isset($filters['search'])) {
@@ -59,7 +63,26 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         }
 
         $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
-        return $query->paginate($limit);
+        $tasks = $query->get();
+
+        // Loại bỏ subtask mà user cũng có quyền xem task cha
+        $userTaskIds = $tasks->pluck('id')->toArray();
+        $visibleTasks = $tasks->filter(function($task) use ($userTaskIds) {
+            return is_null($task->parent_id) || !in_array($task->parent_id, $userTaskIds);
+        });
+
+        // Phân trang thủ công
+        $page = request('page', 1);
+        $perPage = $limit;
+        $paged = $visibleTasks->forPage($page, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paged,
+            $visibleTasks->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        return $paginator;
     }
 
     public function createTask(array $data)
@@ -75,6 +98,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'main_assignee_id' => $data['mainHandler'],
             'status' => 'in_progress',
             'created_by' => Auth::user()->id,
+            'parent_id' => $data['parent_id'] ?? null,
         ];
         $dataCollaborators = $data['assignees'];
 
@@ -109,6 +133,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'main_assignee_id' => $data['mainHandler'],
             'assigner_id' => $data['assigner'],
             'status' => $data['status'],
+            'quality_weight' => $data['qualityWeight'] ?? null,
         ];
         $dataCollaborators = $data['assignees'];
         $updateReason = $data['changeReason'] ?? 'Cập nhật task';
