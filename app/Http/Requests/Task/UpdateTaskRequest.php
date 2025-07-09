@@ -32,6 +32,26 @@ class UpdateTaskRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $parentId = $this->input('parent_id');
+            if ($parentId) {
+                $parent = \App\Models\Task::find($parentId);
+                if ($parent) {
+                    $startDate = $this->input('startDate');
+                    $deadline = $this->input('deadline');
+                    if ($startDate && ($startDate < $parent->start_date)) {
+                        $validator->errors()->add('startDate', 'Ngày bắt đầu của task con không được nhỏ hơn ngày bắt đầu của task cha ('.$parent->start_date.')');
+                    }
+                    if ($deadline && ($deadline > $parent->due_date)) {
+                        $validator->errors()->add('deadline', 'Hạn xử lý của task con không được lớn hơn hạn xử lý của task cha ('.$parent->due_date.')');
+                    }
+                }
+            }
+        });
+    }
+
     public function messages()
     {
         return [

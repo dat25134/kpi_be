@@ -63,7 +63,26 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
         }
 
         $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
-        return $query->paginate($limit);
+        $tasks = $query->get();
+
+        // Loại bỏ subtask mà user cũng có quyền xem task cha
+        $userTaskIds = $tasks->pluck('id')->toArray();
+        $visibleTasks = $tasks->filter(function($task) use ($userTaskIds) {
+            return is_null($task->parent_id) || !in_array($task->parent_id, $userTaskIds);
+        });
+
+        // Phân trang thủ công
+        $page = request('page', 1);
+        $perPage = $limit;
+        $paged = $visibleTasks->forPage($page, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paged,
+            $visibleTasks->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        return $paginator;
     }
 
     public function createTask(array $data)

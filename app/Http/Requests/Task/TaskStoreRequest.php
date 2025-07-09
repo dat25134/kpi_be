@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Task;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TaskStoreRequest extends FormRequest
@@ -29,6 +30,26 @@ class TaskStoreRequest extends FormRequest
             'files.*' => 'file|max:10240', // 10MB mỗi file
             'parent_id' => 'nullable|exists:tasks,id',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $parentId = $this->input('parent_id');
+            if ($parentId) {
+                $parent = \App\Models\Task::find($parentId);
+                if ($parent) {
+                    $startDate = $this->input('startDate');
+                    $deadline = $this->input('deadline');
+                    if ($startDate && ($startDate < $parent->start_date)) {
+                        $validator->errors()->add('startDate', 'Ngày bắt đầu của task con không được nhỏ hơn ngày bắt đầu của task cha ('. Carbon::parse($parent->start_date)->format('d/m/Y') .')');
+                    }
+                    if ($deadline && ($deadline > $parent->due_date)) {
+                        $validator->errors()->add('deadline', 'Hạn xử lý của task con không được lớn hơn hạn xử lý của task cha ('. Carbon::parse($parent->due_date)->format('d/m/Y') .')');
+                    }
+                }
+            }
+        });
     }
 
     public function messages()
