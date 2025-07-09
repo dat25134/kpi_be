@@ -18,6 +18,7 @@ class Task extends Model implements HasMedia
         'category_id',
         'department_id',
         'weight',
+        'quality_weight',
         'assigner_id',
         'main_assignee_id',
         'status',

@@ -14,7 +14,7 @@ class UpdateTaskRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'content' => 'sometimes|required|string',
             'startDate' => 'sometimes|required|date',
             'deadline' => 'sometimes|required|date',
@@ -30,6 +30,10 @@ class UpdateTaskRequest extends FormRequest
             'files.*' => 'file|max:10240', // 10MB mỗi file
             'changeReason' => 'required|string|min:10|max:500',
         ];
+        if ($this->input('status') === 'completed') {
+            $rules['qualityWeight'] = 'required|in:1,2,3,4';
+        }
+        return $rules;
     }
 
     public function withValidator($validator)
@@ -82,6 +86,8 @@ class UpdateTaskRequest extends FormRequest
             'changeReason.string' => 'Lý do cập nhật không hợp lệ',
             'changeReason.min' => 'Lý do cập nhật phải có ít nhất 10 ký tự',
             'changeReason.max' => 'Lý do cập nhật không được vượt quá 500 ký tự',
+            'qualityWeight.required' => 'Vui lòng nhập trọng số chất lượng khi hoàn thành task',
+            'qualityWeight.in' => 'Trọng số chất lượng chỉ nhận giá trị 1, 2, 3 hoặc 4',
         ];
     }
 } 

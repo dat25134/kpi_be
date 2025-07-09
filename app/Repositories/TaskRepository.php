@@ -133,6 +133,7 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'main_assignee_id' => $data['mainHandler'],
             'assigner_id' => $data['assigner'],
             'status' => $data['status'],
+            'quality_weight' => $data['qualityWeight'] ?? null,
         ];
         $dataCollaborators = $data['assignees'];
         $updateReason = $data['changeReason'] ?? 'Cập nhật task';

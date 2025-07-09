@@ -30,6 +30,7 @@ class TaskResource extends JsonResource
                 ];
             }),
             "count"            => $this->weight,
+            "qualityWeight"    => $this->quality_weight,
             "startDate"        => $this->start_date,
             "deadline"         => $this->due_date,
             "createdAt"        => $this->created_at,
@@ -61,6 +62,7 @@ class TaskResource extends JsonResource
                         ];
                     }),
                     'count' => $subtask->weight,
+                    'qualityWeight' => $subtask->quality_weight,
                     'createdAt' => $subtask->created_at,
                 ];
             }),
