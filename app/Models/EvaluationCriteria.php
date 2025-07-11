@@ -10,8 +10,8 @@ class EvaluationCriteria extends Model
     use SoftDeletes;
     protected $table = 'evaluation_criteria';
     protected $fillable = [
-        'role_type',
-        'category',
+        'role_id',
+        'category_criteria_id',
         'name',
         'description',
         'max_score',
@@ -29,6 +29,16 @@ class EvaluationCriteria extends Model
     public function evaluationDetails()
     {
         return $this->hasMany(EvaluationDetail::class, 'criteria_id');
+    }
+
+    public function categoryCriteria()
+    {
+        return $this->belongsTo(CategoryCriteria::class, 'category_criteria_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function scopeActive($query)

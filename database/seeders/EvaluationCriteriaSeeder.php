@@ -4,19 +4,22 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\EvaluationCriteria;
+use App\Models\Role;
+use App\Models\CategoryCriteria;
 
 class EvaluationCriteriaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // Lấy id các role theo code
+        $roles = Role::pluck('id', 'code'); // ['TP' => 4, 'PP' => 5, 'NV' => 6, ...]
+        // Lấy id các category_criteria theo name
+        $categories = CategoryCriteria::pluck('id', 'name'); // ['Chính trị, tư tưởng' => 1, ...]
+
         $criteria = [
-            // ===== TIÊU CHÍ CHO TRƯỞNG PHÒNG (CHI TIẾT) =====
             [
-                'role_type' => 'truongphong',
-                'category' => 'chinh_tri',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Chính trị, tư tưởng'],
                 'name' => 'Chấp hành chủ trương, đường lối, quy định của Đảng, chính sách, pháp luật của Nhà nước và các nguyên tắc tổ chức, kỷ luật của Đảng, nhất là nguyên tắc tập trung dân chủ, tự phê bình và phê bình trong cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 5.00,
@@ -24,10 +27,9 @@ class EvaluationCriteriaSeeder extends Seeder
                 'order' => 1,
                 'is_active' => true,
             ],
-            // Đạo đức, lối sống (5 điểm, tách nhỏ)
             [
-                'role_type' => 'truongphong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không tham ô, tham nhũng, tiêu cực, lãng phí, quan liêu, cơ hội, vụ lợi, hách dịch, cửa quyền; không có biểu hiện suy thoái về đạo đức, lối sống, tự diễn biến, tự chuyển hóa',
                 'description' => '',
                 'max_score' => 2.00,
@@ -36,8 +38,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Có lối sống trung thực, khiêm tốn, chân thành, trong sáng, giản dị',
                 'description' => '',
                 'max_score' => 1.00,
@@ -46,9 +48,9 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'dao_duc',
-                'name' => 'Có tinh thần đoàn kết, xây dựng cơ quan, tổ chức, đơn vị trong sạch, vững mạnh',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
+                'name' => 'Có tinh thần đoàn kết, xây dựng cơ quan, đơn vị trong sạch, vững mạnh',
                 'description' => '',
                 'max_score' => 1.00,
                 'weight' => 1.00,
@@ -56,8 +58,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không để người thân, người quen lợi dụng vị trí công tác của cá nhân để vụ lợi',
                 'description' => '',
                 'max_score' => 1.00,
@@ -65,10 +67,9 @@ class EvaluationCriteriaSeeder extends Seeder
                 'order' => 5,
                 'is_active' => true,
             ],
-            // Tác phong, lề lối làm việc (5 điểm, tách nhỏ)
             [
-                'role_type' => 'truongphong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có trách nhiệm với công việc, năng động, sáng tạo, dám nghĩ, dám làm, linh hoạt trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 2.00,
@@ -77,8 +78,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Phương pháp làm việc dân chủ, khoa học, đúng nguyên tắc',
                 'description' => '',
                 'max_score' => 1.00,
@@ -87,8 +88,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có tinh thần trách nhiệm và phối hợp trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 1.00,
@@ -97,8 +98,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có thái độ đúng mực và phong cách ứng xử, lề lối làm việc chuẩn mực, đáp ứng văn hóa công vụ và văn hóa của ngành, của cơ quan',
                 'description' => '',
                 'max_score' => 1.00,
@@ -106,10 +107,9 @@ class EvaluationCriteriaSeeder extends Seeder
                 'order' => 9,
                 'is_active' => true,
             ],
-            // Ý thức tổ chức kỷ luật (5 điểm, tách nhỏ)
             [
-                'role_type' => 'truongphong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Chấp hành sự phân công của cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 1.5,
@@ -118,8 +118,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Thực hiện đúng các quy định, quy chế của cơ quan',
                 'description' => '',
                 'max_score' => 1.5,
@@ -128,8 +128,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Tham gia đầy đủ các cuộc họp của Cơ quan, Chi bộ và các tổ chức đoàn thể theo quy định, điều lệ (vắng phải có lý do chính đáng)',
                 'description' => '',
                 'max_score' => 1.00,
@@ -138,8 +138,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Báo cáo đúng hạn, trung thực, đầy đủ, cung cấp thông tin chính xác, khách quan về những nội dung liên quan đến việc thực hiện chức trách, nhiệm vụ được giao và hoạt động của cơ quan, đơn vị khi được yêu cầu',
                 'description' => '',
                 'max_score' => 1.00,
@@ -147,10 +147,9 @@ class EvaluationCriteriaSeeder extends Seeder
                 'order' => 13,
                 'is_active' => true,
             ],
-            // Thực hiện chuyển đổi số và cải cách hành chính (10 điểm, tách nhỏ)
             [
-                'role_type' => 'truongphong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Sử dụng đầy đủ, đúng quy định các phần mềm, nền tảng số triển khai trong cơ quan',
                 'description' => '',
                 'max_score' => 3.00,
@@ -159,8 +158,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Có sáng kiến, giải pháp mới trong việc thực hiện cải cách hành chính ở cơ quan',
                 'description' => '',
                 'max_score' => 2.00,
@@ -169,8 +168,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Tham gia đầy đủ và đạt kết quả tốt các lớp tập huấn được phân công',
                 'description' => '',
                 'max_score' => 2.00,
@@ -179,8 +178,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Không có phản ánh về tinh thần, thái độ phục vụ Nhân dân',
                 'description' => '',
                 'max_score' => 3.00,
@@ -191,8 +190,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // ===== NHÓM II: KẾT QUẢ THỰC HIỆN NHIỆM VỤ, CHỨC TRÁCH ĐƯỢC GIAO (70 điểm) =====
             // 1. Năng lực lãnh đạo, quản lý (10 điểm)
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chủ động nghiên cứu, cập nhật kịp thời các quy định của pháp luật, của ngành về lĩnh vực phụ trách; tham mưu cho BGĐ đầy đủ, có chất lượng các văn bản phục vụ chỉ đạo, điều hành của Lãnh đạo tỉnh và Lãnh đạo UBND',
                 'description' => 'Sai sót chủ quan 01 nhiệm vụ trừ 0,25 điểm. Điểm trừ không quá 01 điểm',
                 'max_score' => 1.00,
@@ -201,8 +200,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Xây dựng kế hoạch công tác của phòng/đơn vị theo lĩnh vực được phân công và kế hoạch công tác của cá nhân rõ nội dung và tiến độ',
                 'description' => '',
                 'max_score' => 1.00,
@@ -211,8 +210,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chỉ đạo, điều hành, kiểm soát việc thực hiện của phòng/đơn vị phụ trách bảo đảm kịp thời, không bỏ sót nhiệm vụ. Giải quyết công việc đúng quy trình, quy định',
                 'description' => 'Sai sót chủ quan 01 nhiệm vụ trừ 0,25 điểm. Điểm trừ không quá 01 điểm',
                 'max_score' => 1.00,
@@ -221,8 +220,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Kiểm tra, bao quát, đôn đốc việc thực hiện nhiệm vụ của CCVC trong phòng/đơn vị và giải quyết kịp thời các khó khăn, vướng mắc theo thẩm quyền',
                 'description' => '',
                 'max_score' => 1.00,
@@ -231,8 +230,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Tham mưu chỉ đạo, hướng dẫn chuyên môn, nghiệp vụ đối với các tổ chức, cơ quan, đơn vị trong lĩnh vực phụ trách bảo đảm hiệu quả, thống nhất',
                 'description' => '',
                 'max_score' => 1.00,
@@ -241,8 +240,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chủ động tham mưu, đề xuất nhiệm vụ, công việc có liên quan đến lĩnh vực được giao phụ trách; Báo cáo kịp thời kết quả nhiệm vụ được giao',
                 'description' => '',
                 'max_score' => 1.00,
@@ -251,8 +250,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Phối hợp với các phòng/đơn vị khác trong cơ quan khi thực hiện nhiệm vụ, chức trách được giao bảo đảm thống nhất, nhanh chóng, hiệu quả',
                 'description' => '',
                 'max_score' => 1.00,
@@ -261,8 +260,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Lãnh đạo phòng/đơn vị phụ trách làm việc hiệu quả; thực hiện CCHC; chuyển đổi số; thực hiện quản lý CCVC theo phân cấp, phân quyền',
                 'description' => '',
                 'max_score' => 1.00,
@@ -271,8 +270,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Các văn bản do phòng/đơn vị tham mưu phải bảo đảm đúng thể thức, quy trình, quy định, thủ tục ban hành, không có sai sót và phải đúng hạn theo quy định của Sở, của tỉnh',
                 'description' => '',
                 'max_score' => 1.00,
@@ -281,8 +280,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'truongphong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Có năng lực tập hợp CCVC trong phòng/đơn vị đoàn kết, thống nhất',
                 'description' => '',
                 'max_score' => 1.00,
@@ -292,8 +291,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 2. Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng (55 điểm)
             [
-                'role_type' => 'truongphong',
-                'category' => 'ket_qua',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Kết quả thực hiện nhiệm vụ của phòng/đơn vị - Xếp loại A/B/C/D',
                 'description' => '',
                 'max_score' => 55.00,
@@ -303,8 +302,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 3. Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao (5 điểm)
             [
-                'role_type' => 'truongphong',
-                'category' => 'ket_qua',
+                'role_id' => $roles['TP'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao',
                 'description' => '',
                 'max_score' => 5.00,
@@ -317,8 +316,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // ===== NHÓM I: CHÍNH TRỊ, TƯ TƯỞNG; ĐẠO ĐỨC, LỐI SỐNG; TÁC PHONG, LỀ LỐI LÀM VIỆC; Ý THỨC TỔ CHỨC KỶ LUẬT; THỰC HIỆN CHUYỂN ĐỔI SỐ VÀ CẢI CÁCH HÀNH CHÍNH (30 điểm) =====
             // 1. Chính trị, tư tưởng (5 điểm)
             [
-                'role_type' => 'phophong',
-                'category' => 'chinh_tri',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Chính trị, tư tưởng'],
                 'name' => 'Chấp hành chủ trương, đường lối, quy định của Đảng, chính sách, pháp luật của Nhà nước và các nguyên tắc tổ chức, kỷ luật của Đảng, nhất là nguyên tắc tập trung dân chủ, tự phê bình và phê bình trong cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 5.00,
@@ -328,8 +327,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 2. Đạo đức, lối sống (5 điểm, tách nhỏ)
             [
-                'role_type' => 'phophong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không tham ô, tham nhũng, tiêu cực, lãng phí, quan liêu, cơ hội, vụ lợi, hách dịch, cửa quyền; không có biểu hiện suy thoái về đạo đức, lối sống, tự diễn biến, tự chuyển hóa',
                 'description' => '',
                 'max_score' => 2.00,
@@ -338,8 +337,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Có lối sống trung thực, khiêm tốn, chân thành, trong sáng, giản dị',
                 'description' => '',
                 'max_score' => 1.00,
@@ -348,8 +347,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Có tinh thần đoàn kết, xây dựng cơ quan, đơn vị trong sạch, vững mạnh',
                 'description' => '',
                 'max_score' => 1.00,
@@ -358,8 +357,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'dao_duc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không để người thân, người quen lợi dụng vị trí công tác của cá nhân để vụ lợi',
                 'description' => '',
                 'max_score' => 1.00,
@@ -369,8 +368,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 3. Tác phong, lề lối làm việc (5 điểm, tách nhỏ)
             [
-                'role_type' => 'phophong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có trách nhiệm với công việc, năng động, sáng tạo, dám nghĩ, dám làm, linh hoạt trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 2.00,
@@ -379,8 +378,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Phương pháp làm việc dân chủ, khoa học, đúng nguyên tắc',
                 'description' => '',
                 'max_score' => 1.00,
@@ -389,8 +388,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có tinh thần trách nhiệm và phối hợp trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 1.00,
@@ -399,8 +398,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'tac_phong',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có thái độ đúng mực và phong cách ứng xử, lề lối làm việc chuẩn mực, đáp ứng văn hóa công vụ và văn hóa của ngành, của cơ quan',
                 'description' => '',
                 'max_score' => 1.00,
@@ -410,8 +409,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 4. Ý thức tổ chức kỷ luật (5 điểm, tách nhỏ)
             [
-                'role_type' => 'phophong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Chấp hành sự phân công của cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 1.5,
@@ -420,8 +419,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Thực hiện đúng các quy định, quy chế của cơ quan',
                 'description' => '',
                 'max_score' => 1.5,
@@ -430,8 +429,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Tham gia đầy đủ các cuộc họp của Cơ quan, Chi bộ và các tổ chức đoàn thể theo quy định, điều lệ (vắng phải có lý do chính đáng)',
                 'description' => '',
                 'max_score' => 1.00,
@@ -440,8 +439,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'y_thuc',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Báo cáo đúng hạn, trung thực, đầy đủ, cung cấp thông tin chính xác, khách quan về những nội dung liên quan đến việc thực hiện chức trách, nhiệm vụ được giao và hoạt động của cơ quan, đơn vị khi được yêu cầu',
                 'description' => '',
                 'max_score' => 1.00,
@@ -451,8 +450,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 5. Thực hiện chuyển đổi số và cải cách hành chính (10 điểm, tách nhỏ)
             [
-                'role_type' => 'phophong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Sử dụng đầy đủ, đúng quy định các phần mềm, nền tảng số triển khai trong cơ quan',
                 'description' => '',
                 'max_score' => 3.00,
@@ -461,8 +460,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Có sáng kiến, giải pháp mới trong việc thực hiện CCHC ở cơ quan',
                 'description' => '',
                 'max_score' => 2.00,
@@ -471,8 +470,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Tham gia đầy đủ và đạt kết quả tốt các lớp tập huấn được phân công',
                 'description' => '',
                 'max_score' => 2.00,
@@ -481,8 +480,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Không có phản ánh về tinh thần, thái độ phục vụ Nhân dân',
                 'description' => '',
                 'max_score' => 3.00,
@@ -493,8 +492,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // ===== NHÓM II: KẾT QUẢ THỰC HIỆN NHIỆM VỤ, CHỨC TRÁCH ĐƯỢC GIAO (70 điểm) =====
             // 1. Năng lực lãnh đạo, quản lý (10 điểm)
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chủ động nghiên cứu, cập nhật kịp thời các quy định của pháp luật, của ngành về lĩnh vực phụ trách; tham mưu cho Ban lãnh đạo đầy đủ, có chất lượng các văn bản phục vụ chỉ đạo, điều hành của Lãnh đạo tỉnh và Lãnh đạo UBND xã',
                 'description' => 'Sai sót chủ quan 01 nhiệm vụ trừ 0,25 điểm. Điểm trừ không quá 01 điểm',
                 'max_score' => 1.00,
@@ -503,8 +502,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Xây dựng kế hoạch công tác của phòng/đơn vị theo lĩnh vực được phân công và kế hoạch công tác của cá nhân rõ nội dung và tiến độ',
                 'description' => '',
                 'max_score' => 1.00,
@@ -513,8 +512,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chỉ đạo, điều hành, kiểm soát việc thực hiện của phòng/đơn vị phụ trách bảo đảm kịp thời, không bỏ sót nhiệm vụ. Giải quyết công việc đúng quy trình, quy định',
                 'description' => 'Sai sót chủ quan 01 nhiệm vụ trừ 0,25 điểm. Điểm trừ không quá 01 điểm',
                 'max_score' => 1.00,
@@ -523,8 +522,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Kiểm tra, bao quát, đôn đốc việc thực hiện nhiệm vụ của CCVC trong phòng/đơn vị và giải quyết kịp thời các khó khăn, vướng mắc theo thẩm quyền',
                 'description' => '',
                 'max_score' => 1.00,
@@ -533,8 +532,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Tham mưu chỉ đạo, hướng dẫn chuyên môn, nghiệp vụ đối với các tổ chức, cơ quan, đơn vị trong lĩnh vực phụ trách đảm bảo hiệu quả, thống nhất',
                 'description' => '',
                 'max_score' => 1.00,
@@ -543,8 +542,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Chủ động tham mưu, đề xuất nhiệm vụ, công việc có liên quan đến lĩnh vực được giao phụ trách; Báo cáo kịp thời kết quả nhiệm vụ được giao',
                 'description' => '',
                 'max_score' => 1.00,
@@ -553,8 +552,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Phối hợp với các phòng/đơn vị khác trong cơ quan khi thực hiện nhiệm vụ, chức trách được giao bảo đảm thống nhất, nhanh chóng, hiệu quả',
                 'description' => '',
                 'max_score' => 1.00,
@@ -563,8 +562,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Lãnh đạo phòng/đơn vị phụ trách làm việc hiệu quả; thực hiện CCHC; chuyển đổi số; thực hiện quản lý CCVC theo phân cấp, phân quyền',
                 'description' => '',
                 'max_score' => 1.00,
@@ -573,8 +572,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Các văn bản do phòng/đơn vị tham mưu phải bảo đảm đúng thể thức, quy trình, quy định, thủ tục ban hành, không có sai sót và phải đúng hạn theo quy định của Sở, của tỉnh',
                 'description' => '',
                 'max_score' => 1.00,
@@ -583,8 +582,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'phophong',
-                'category' => 'lanh_dao',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Năng lực lãnh đạo, quản lý'],
                 'name' => 'Có năng lực tập hợp CCVC trong phòng/đơn vị đoàn kết, thống nhất',
                 'description' => '',
                 'max_score' => 1.00,
@@ -595,8 +594,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // 2. Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng (55 điểm)
             // 2.1. Kết quả thực hiện nhiệm vụ của phòng/đơn vị (10 điểm)
             [
-                'role_type' => 'phophong',
-                'category' => 'ket_qua',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Kết quả thực hiện nhiệm vụ của phòng/đơn vị - Xếp loại A/B/C/D',
                 'description' => '',
                 'max_score' => 10.00,
@@ -606,8 +605,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 2.2. Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng (45 điểm)
             [
-                'role_type' => 'phophong',
-                'category' => 'ket_qua',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng - Mức độ Đạt vượt mức/ Đạt/ Đạt, còn hạn chế/ Không đạt',
                 'description' => '',
                 'max_score' => 45.00,
@@ -617,8 +616,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 3. Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao (5 điểm)
             [
-                'role_type' => 'phophong',
-                'category' => 'ket_qua',
+                'role_id' => $roles['PP'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao',
                 'description' => '',
                 'max_score' => 5.00,
@@ -631,8 +630,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // ===== NHÓM I: CHÍNH TRỊ, TƯ TƯỞNG; ĐẠO ĐỨC, LỐI SỐNG; TÁC PHONG, LỀ LỐI LÀM VIỆC; Ý THỨC TỔ CHỨC KỶ LUẬT; THỰC HIỆN CHUYỂN ĐỔI SỐ VÀ CẢI CÁCH HÀNH CHÍNH (30 điểm) =====
             // 1. Chính trị, tư tưởng (5 điểm)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'chinh_tri',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Chính trị, tư tưởng'],
                 'name' => 'Chấp hành chủ trương, đường lối, quy định của Đảng, chính sách, pháp luật của Nhà nước và các nguyên tắc tổ chức, kỷ luật của Đảng, nhất là nguyên tắc tập trung dân chủ, tự phê bình và phê bình trong cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 5.00,
@@ -642,8 +641,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 2. Đạo đức, lối sống (5 điểm, tách nhỏ)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'dao_duc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không tham ô, tham nhũng, tiêu cực, lãng phí, quan liêu, cơ hội, vụ lợi, hách dịch, cửa quyền; không có biểu hiện suy thoái về đạo đức, lối sống, tự diễn biến, tự chuyển hóa',
                 'description' => '',
                 'max_score' => 2.00,
@@ -652,8 +651,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'dao_duc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Có lối sống trung thực, khiêm tốn, chân thành, trong sáng, giản dị',
                 'description' => '',
                 'max_score' => 1.00,
@@ -662,8 +661,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'dao_duc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Có tinh thần đoàn kết, xây dựng cơ quan, tổ chức, đơn vị trong sạch, vững mạnh',
                 'description' => '',
                 'max_score' => 1.00,
@@ -672,8 +671,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'dao_duc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Đạo đức, lối sống'],
                 'name' => 'Không để người thân, người quen lợi dụng vị trí công tác của cá nhân để vụ lợi',
                 'description' => '',
                 'max_score' => 1.00,
@@ -683,8 +682,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 3. Tác phong, lề lối làm việc (5 điểm, tách nhỏ)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'tac_phong',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có trách nhiệm với công việc, năng động, sáng tạo, dám nghĩ, dám làm, linh hoạt trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 2.00,
@@ -693,8 +692,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'tac_phong',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Phương pháp làm việc dân chủ, khoa học, đúng nguyên tắc',
                 'description' => '',
                 'max_score' => 1.00,
@@ -703,8 +702,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'tac_phong',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có tinh thần trách nhiệm và phối hợp trong thực hiện nhiệm vụ',
                 'description' => '',
                 'max_score' => 1.00,
@@ -713,8 +712,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'tac_phong',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Tác phong, lề lối làm việc'],
                 'name' => 'Có thái độ đúng mực và phong cách ứng xử, lề lối làm việc chuẩn mực, đáp ứng văn hóa công vụ và văn hóa của ngành, của cơ quan',
                 'description' => '',
                 'max_score' => 1.00,
@@ -724,8 +723,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 4. Ý thức tổ chức kỷ luật (5 điểm, tách nhỏ)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'y_thuc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Chấp hành sự phân công của cơ quan, đơn vị',
                 'description' => '',
                 'max_score' => 1.5,
@@ -734,8 +733,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'y_thuc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Thực hiện đúng các quy định, quy chế của cơ quan',
                 'description' => '',
                 'max_score' => 1.5,
@@ -744,8 +743,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'y_thuc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Tham gia đầy đủ các cuộc họp của Cơ quan, Chi bộ và các tổ chức đoàn thể theo quy định, điều lệ (vắng phải có lý do chính đáng)',
                 'description' => '',
                 'max_score' => 1.00,
@@ -754,8 +753,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'y_thuc',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Ý thức tổ chức kỷ luật'],
                 'name' => 'Báo cáo đúng hạn, trung thực, đầy đủ, cung cấp thông tin chính xác, khách quan về những nội dung liên quan đến việc thực hiện chức trách, nhiệm vụ được giao và hoạt động của cơ quan, đơn vị khi được yêu cầu',
                 'description' => '',
                 'max_score' => 1.00,
@@ -765,8 +764,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 5. Thực hiện chuyển đổi số và cải cách hành chính (10 điểm, tách nhỏ)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Sử dụng đầy đủ, đúng quy định các phần mềm, nền tảng số triển khai trong cơ quan',
                 'description' => '',
                 'max_score' => 3.00,
@@ -775,8 +774,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Có sáng kiến, giải pháp mới trong việc thực hiện CCHC ở cơ quan',
                 'description' => '',
                 'max_score' => 2.00,
@@ -785,8 +784,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Tham gia đầy đủ và đạt kết quả tốt các lớp tập huấn được phân công',
                 'description' => '',
                 'max_score' => 2.00,
@@ -795,8 +794,8 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'role_type' => 'nhanvien',
-                'category' => 'chuyen_doi_so',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Thực hiện chuyển đổi số và cải cách hành chính'],
                 'name' => 'Không có phản ánh về tinh thần, thái độ phục vụ Nhân dân',
                 'description' => '',
                 'max_score' => 3.00,
@@ -807,8 +806,8 @@ class EvaluationCriteriaSeeder extends Seeder
             // ===== NHÓM II: KẾT QUẢ THỰC HIỆN NHIỆM VỤ, CHỨC TRÁCH ĐƯỢC GIAO (70 điểm) =====
             // 1. Kết quả thực hiện nhiệm vụ của phòng/đơn vị (10 điểm)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'ket_qua',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Kết quả thực hiện nhiệm vụ của phòng/đơn vị - Xếp loại A/B/C/D',
                 'description' => '',
                 'max_score' => 10.00,
@@ -818,8 +817,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 2. Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng (55 điểm)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'ket_qua',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Thực hiện nhiệm vụ theo kế hoạch, lịch công tác và nhiệm vụ đột xuất đúng tiến độ, chất lượng - Mức độ Đạt vượt mức/ Đạt/ Đạt, còn hạn chế/ Không đạt',
                 'description' => '',
                 'max_score' => 55.00,
@@ -829,8 +828,8 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
             // 3. Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao (5 điểm)
             [
-                'role_type' => 'nhanvien',
-                'category' => 'ket_qua',
+                'role_id' => $roles['NV'],
+                'category_criteria_id' => $categories['Kết quả thực hiện nhiệm vụ, chức trách được giao'],
                 'name' => 'Có sáng kiến trong triển khai nhiệm vụ chuyên môn theo chức năng, nhiệm vụ được giao',
                 'description' => '',
                 'max_score' => 5.00,
@@ -839,6 +838,17 @@ class EvaluationCriteriaSeeder extends Seeder
                 'is_active' => true,
             ],
         ];
+
+        // Đánh lại order cho từng nhóm role_id + category_criteria_id
+        $orderMap = [];
+        foreach ($criteria as $i => $criterion) {
+            $key = $criterion['role_id'] . '-' . $criterion['category_criteria_id'];
+            if (!isset($orderMap[$key])) {
+                $orderMap[$key] = 1;
+            }
+            $criteria[$i]['order'] = $orderMap[$key];
+            $orderMap[$key]++;
+        }
 
         foreach ($criteria as $criterion) {
             EvaluationCriteria::create($criterion);

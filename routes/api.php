@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\EvaluationCriteriaController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
@@ -99,6 +100,20 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/permission-modules', [PermissionController::class, 'modulePermission']);
             Route::post('/sync-permission', [PermissionController::class, 'syncPermission']);
             Route::post('/sync-permission-by-employee', [PermissionController::class, 'syncPermissionByEmployee']);
+        });
+
+        // Evaluation Criteria
+        Route::prefix('evaluation-criteria')->group(function () {
+            Route::get('/', [EvaluationCriteriaController::class, 'index']);
+            Route::post('/category', [EvaluationCriteriaController::class, 'storeCategory']);
+            Route::put('/category/{id}', [EvaluationCriteriaController::class, 'updateCategory']);
+            Route::delete('/category/{id}', [EvaluationCriteriaController::class, 'destroyCategory']);
+            Route::post('/criteria', [EvaluationCriteriaController::class, 'storeCriteria']);
+            Route::put('/criteria/{id}', [EvaluationCriteriaController::class, 'updateCriteria']);
+            Route::delete('/criteria/{id}', [EvaluationCriteriaController::class, 'destroyCriteria']);
+            // Route::get('/{id}', [EvaluationCriteriaController::class, 'show']);
+            // Route::post('/', [EvaluationCriteriaController::class, 'store']);
+            // Route::put('/{id}', [EvaluationCriteriaController::class, 'update']);
         });
     });
 });

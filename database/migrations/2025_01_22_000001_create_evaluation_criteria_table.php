@@ -21,7 +21,7 @@ return new class extends Migration
                 'ket_qua'
             ]);
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->decimal('max_score', 5, 2);
             $table->decimal('weight', 3, 2)->default(1.00);
             $table->integer('order')->default(0);
