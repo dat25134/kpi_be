@@ -7,6 +7,7 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\CategoryCriteriaResource;
+use App\Http\Requests\EvaluationCriteria\StoreCategoryCriteriaRequest;
 
 class EvaluationCriteriaController extends Controller
 {
@@ -32,6 +33,16 @@ class EvaluationCriteriaController extends Controller
             'status' => 'success',
             'message' => 'Lấy danh sách tiêu chí đánh giá thành công',
             'data' => CategoryCriteriaResource::collection($categories)
+        ]);
+    }
+
+    public function storeCategory(StoreCategoryCriteriaRequest $request)
+    {
+        $category = CategoryCriteria::create($request->all());
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Thêm danh mục tiêu chí đánh giá thành công',
+            'data' => new CategoryCriteriaResource($category)
         ]);
     }
 } 
