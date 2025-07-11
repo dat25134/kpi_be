@@ -45,4 +45,15 @@ class EvaluationCriteriaController extends Controller
             'data' => new CategoryCriteriaResource($category)
         ]);
     }
+
+    public function updateCategory(StoreCategoryCriteriaRequest $request, $id)
+    {
+        $category = CategoryCriteria::findOrFail($id);
+        $category->update($request->all());
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cập nhật danh mục tiêu chí đánh giá thành công',
+            'data' => new CategoryCriteriaResource($category)
+        ]);
+    }
 } 

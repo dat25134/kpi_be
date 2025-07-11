@@ -106,6 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('evaluation-criteria')->group(function () {
             Route::get('/', [EvaluationCriteriaController::class, 'index']);
             Route::post('/category', [EvaluationCriteriaController::class, 'storeCategory']);
+            Route::put('/category/{id}', [EvaluationCriteriaController::class, 'updateCategory']);
             // Route::get('/{id}', [EvaluationCriteriaController::class, 'show']);
             // Route::post('/', [EvaluationCriteriaController::class, 'store']);
             // Route::put('/{id}', [EvaluationCriteriaController::class, 'update']);
