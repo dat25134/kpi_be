@@ -107,6 +107,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [EvaluationCriteriaController::class, 'index']);
             Route::post('/category', [EvaluationCriteriaController::class, 'storeCategory']);
             Route::put('/category/{id}', [EvaluationCriteriaController::class, 'updateCategory']);
+            Route::delete('/category/{id}', [EvaluationCriteriaController::class, 'destroyCategory']);
+            Route::post('/criteria', [EvaluationCriteriaController::class, 'storeCriteria']);
+            Route::put('/criteria/{id}', [EvaluationCriteriaController::class, 'updateCriteria']);
+            Route::delete('/criteria/{id}', [EvaluationCriteriaController::class, 'destroyCriteria']);
             // Route::get('/{id}', [EvaluationCriteriaController::class, 'show']);
             // Route::post('/', [EvaluationCriteriaController::class, 'store']);
             // Route::put('/{id}', [EvaluationCriteriaController::class, 'update']);

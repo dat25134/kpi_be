@@ -839,6 +839,17 @@ class EvaluationCriteriaSeeder extends Seeder
             ],
         ];
 
+        // Đánh lại order cho từng nhóm role_id + category_criteria_id
+        $orderMap = [];
+        foreach ($criteria as $i => $criterion) {
+            $key = $criterion['role_id'] . '-' . $criterion['category_criteria_id'];
+            if (!isset($orderMap[$key])) {
+                $orderMap[$key] = 1;
+            }
+            $criteria[$i]['order'] = $orderMap[$key];
+            $orderMap[$key]++;
+        }
+
         foreach ($criteria as $criterion) {
             EvaluationCriteria::create($criterion);
         }
