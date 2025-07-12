@@ -13,7 +13,7 @@ class EvaluationDetailResource extends JsonResource
             'criteria' => [
                 'id' => $this->criteria->id,
                 'name' => $this->criteria->name,
-                'category' => $this->criteria->category,
+                'category' => $this->criteria->categoryCriteria->name,
                 'max_score' => $this->criteria->max_score,
             ],
             'self_score' => $this->self_score,

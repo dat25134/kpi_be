@@ -12,14 +12,15 @@ class EvaluationResource extends JsonResource
     public function toArray($request)
     {
         $user = $this->user;
-        $role = $user->roles->first()->name ?? null;
+        $role = $user->roles->first();
         $data = [
             'id' => $this->id,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'department' => $user->department->name ?? null,
-                'role' => $role,
+                'role' => $role->name,
+                'roleName' => $role->display_name,
             ],
             'month' => $this->month,
             'year' => $this->year,
@@ -29,7 +30,7 @@ class EvaluationResource extends JsonResource
         ];
         // Nếu là show (single resource), trả về chi tiết
         if ($this->resource instanceof \App\Models\Evaluation && $this->relationLoaded('evaluationDetails')) {
-            $data['details'] = EvaluationDetailResource::collection($this->evaluationDetails)->sortBy('criteria.order');
+            $data['details'] = EvaluationDetailResource::collection($this->evaluationDetails)->sortBy('criteria.order')->values();
         }
         if ($this->resource instanceof \App\Models\Evaluation && $this->relationLoaded('workDescriptions')) {
             $data['work_descriptions'] = WorkDescriptionResource::collection($this->workDescriptions);

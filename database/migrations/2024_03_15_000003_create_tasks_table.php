@@ -13,6 +13,7 @@ class CreateTasksTable extends Migration
             $table->text('content');
             $table->date('start_date');
             $table->date('due_date');
+            $table->date('completed_at')->nullable();
             $table->unsignedBigInteger('category_id');
             $table->unsignedTinyInteger('weight')->nullable();
             $table->unsignedBigInteger('assigner_id');

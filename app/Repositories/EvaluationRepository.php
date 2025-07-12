@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Repositories;
 
-use App\Repositories\Interfaces\EvaluationRepositoryInterface;
 use App\Models\Evaluation;
+use App\Repositories\Interfaces\EvaluationRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -23,21 +22,18 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     public function getEvaluationsWithFilters(Request $request, bool $isAdmin): LengthAwarePaginator
     {
         $roleType = $request->input('type') ?? null;
-        if (!$roleType) {
+        if (! $roleType) {
             throw new \InvalidArgumentException('Tham số type không hợp lệ');
         }
 
         $query = $this->model->query()->with(['user.roles', 'user.department']);
 
-        // Nếu không phải admin thì filter theo type/role
-        if (!$isAdmin) {
-            if ($roleType !== 'personal') {
-                $query->whereHas('user.roles', function ($q) use ($roleType) {
-                    $q->where('name', $roleType);
-                });
-            } else {
-                $query->where('user_id', Auth::id());
-            }
+        if ($roleType !== 'personal') {
+            $query->whereHas('user.roles', function ($q) use ($roleType) {
+                $q->where('name', $roleType);
+            });
+        } else {
+            $query->where('user_id', Auth::id());
         }
 
         // Lọc theo tên
@@ -60,17 +56,17 @@ class EvaluationRepository implements EvaluationRepositoryInterface
         // Lọc theo period (tháng/năm)
         if ($request->filled('month') && $request->filled('year')) {
             $month = $request->input('month');
-            $year = $request->input('year');
+            $year  = $request->input('year');
             $query->where('month', $month)->where('year', $year);
         }
 
         // Phân trang
-        $page = (int)($request->input('page', 1));
-        $pageSize = (int)($request->input('pageSize', 10));
+        $page     = (int) ($request->input('page', 1));
+        $pageSize = (int) ($request->input('pageSize', 10));
 
         return $query->orderByDesc('year')
-                    ->orderByDesc('month')
-                    ->paginate($pageSize, ['*'], 'page', $page);
+            ->orderByDesc('month')
+            ->paginate($pageSize, ['*'], 'page', $page);
     }
 
     /**
@@ -79,10 +75,10 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     public function findById(int $id): ?Evaluation
     {
         return $this->model->with([
-            'user.roles', 
-            'user.department', 
-            'evaluationDetails.criteria', 
-            'workDescriptions'
+            'user.roles',
+            'user.department',
+            'evaluationDetails.criteria',
+            'workDescriptions',
         ])->find($id);
     }
 
@@ -100,7 +96,7 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     public function update(int $id, array $data): bool
     {
         $evaluation = $this->model->find($id);
-        if (!$evaluation) {
+        if (! $evaluation) {
             return false;
         }
         return $evaluation->update($data);
@@ -112,7 +108,7 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     public function delete(int $id): bool
     {
         $evaluation = $this->model->find($id);
-        if (!$evaluation) {
+        if (! $evaluation) {
             return false;
         }
         return $evaluation->delete();
@@ -124,8 +120,8 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     public function findByUserAndPeriod(int $userId, int $month, int $year): ?Evaluation
     {
         return $this->model->where('user_id', $userId)
-                          ->where('month', $month)
-                          ->where('year', $year)
-                          ->first();
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
     }
-} 
+}
