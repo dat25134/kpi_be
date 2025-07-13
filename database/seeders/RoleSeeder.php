@@ -27,7 +27,7 @@ class RoleSeeder extends Seeder
                 'color' => 'green',
             ],
             [
-                'name' => 'chutichubnd',
+                'name' => 'chutich',
                 'code' => 'CTUBND',
                 'display_name' => 'Chủ tịch UBND',
                 'description' => 'Chủ tịch UBND xã/phường',
@@ -37,7 +37,7 @@ class RoleSeeder extends Seeder
                 'color' => 'red',
             ],
             [
-                'name' => 'phochutichubnd',
+                'name' => 'phochutich',
                 'code' => 'PCTUBND',
                 'display_name' => 'Phó Chủ tịch UBND',
                 'description' => 'Phó Chủ tịch UBND xã/phường',

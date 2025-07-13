@@ -151,20 +151,15 @@ class EvaluationRepository implements EvaluationRepositoryInterface
                 'status' => $newStatus,
             ];
 
-            // Chỉ cập nhật total_score và final_grade nếu có
-            if ($request->filled('total_score')) {
-                $evaluationData['total_score'] = $request->input('total_score');
-            }
-            if ($request->filled('final_grade')) {
-                $evaluationData['final_grade'] = $request->input('final_grade');
-            }
-
             $evaluation->update($evaluationData);
 
             // Lưu evaluation details theo giai đoạn hiện tại
             if ($request->has('evaluation_details')) {
                 $this->saveEvaluationDetailsByStage($evaluation->id, $request->input('evaluation_details'), $newStatus);
             }
+
+            // Tính lại total_score và final_grade
+            $this->recalculateTotalScoreAndFinalGrade($evaluation);
 
             // Cập nhật work descriptions (chỉ cấp 1 mới có quyền)
             // TODO: Tạm thời comment để tập trung vào chức năng đánh giá theo từng cấp
@@ -270,6 +265,29 @@ class EvaluationRepository implements EvaluationRepositoryInterface
                 $detailData
             );
         }
+    }
+
+    /**
+     * Tính lại total_score và final_grade cho evaluation
+     */
+    private function recalculateTotalScoreAndFinalGrade($evaluation)
+    {
+        // Lấy tổng final_score của tất cả evaluation details
+        $totalScore = $evaluation->evaluationDetails()->sum('final_score');
+        $evaluation->total_score = $totalScore;
+
+        // Tính final_grade
+        if ($totalScore > 90) {
+            $grade = 'A';
+        } elseif ($totalScore >= 70) {
+            $grade = 'B';
+        } elseif ($totalScore >= 50) {
+            $grade = 'C';
+        } else {
+            $grade = 'D';
+        }
+        $evaluation->final_grade = $grade;
+        $evaluation->save();
     }
 
     // /**

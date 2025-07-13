@@ -38,7 +38,7 @@ class AutoCreateMonthlyEvaluations extends Command
 
         $users = User::where('status', 'active')
             ->whereHas('roles', function ($q) {
-                $q->whereIn('name', ['nhanvien', 'truongphong', 'phophong']);
+                $q->whereIn('name', ['nhanvien', 'truongphong', 'phophong', 'chuyenvien']);
             })
             ->get();
 

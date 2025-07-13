@@ -24,8 +24,8 @@ class StoreEvaluationRequest extends FormRequest
         
         $rules = [
             'status' => ['sometimes', Rule::in(['draft', 'submitted', 'level1_approved', 'level2_approved', 'completed'])],
-            'total_score' => 'sometimes|numeric|min:0|max:100',
-            'final_grade' => ['sometimes', Rule::in(['A', 'B', 'C', 'D'])],
+            // 'total_score' => 'sometimes|numeric|min:0|max:100', // Bỏ không nhận từ client
+            // 'final_grade' => ['sometimes', Rule::in(['A', 'B', 'C', 'D'])], // Bỏ không nhận từ client
         ];
 
         // Validation cho evaluation_details theo giai đoạn
@@ -141,10 +141,10 @@ class StoreEvaluationRequest extends FormRequest
     {
         return [
             'status.in' => 'Trạng thái không hợp lệ. Các giá trị cho phép: draft, submitted, level1_approved, level2_approved, completed',
-            'total_score.numeric' => 'Tổng điểm phải là số',
-            'total_score.min' => 'Tổng điểm không được nhỏ hơn 0',
-            'total_score.max' => 'Tổng điểm không được lớn hơn 100',
-            'final_grade.in' => 'Xếp loại không hợp lệ. Các giá trị cho phép: A, B, C, D',
+            // 'total_score.numeric' => 'Tổng điểm phải là số', // Bỏ không nhận từ client
+            // 'total_score.min' => 'Tổng điểm không được nhỏ hơn 0', // Bỏ không nhận từ client
+            // 'total_score.max' => 'Tổng điểm không được lớn hơn 100', // Bỏ không nhận từ client
+            // 'final_grade.in' => 'Xếp loại không hợp lệ. Các giá trị cho phép: A, B, C, D', // Bỏ không nhận từ client
             'evaluation_details.array' => 'Chi tiết đánh giá phải là mảng',
             'evaluation_details.*.criteria_id.required' => 'ID tiêu chí đánh giá là bắt buộc',
             'evaluation_details.*.criteria_id.exists' => 'Tiêu chí đánh giá không tồn tại',
@@ -165,8 +165,8 @@ class StoreEvaluationRequest extends FormRequest
     {
         return [
             'status' => 'trạng thái',
-            'total_score' => 'tổng điểm',
-            'final_grade' => 'xếp loại',
+            // 'total_score' => 'tổng điểm', // Bỏ không nhận từ client
+            // 'final_grade' => 'xếp loại', // Bỏ không nhận từ client
             'evaluation_details' => 'chi tiết đánh giá',
             'evaluation_details.*.criteria_id' => 'tiêu chí đánh giá',
             'evaluation_details.*.self_score' => 'điểm tự đánh giá',
