@@ -23,7 +23,6 @@ return new class extends Migration
             
             $table->string('unit')->nullable();
             $table->text('target');
-            $table->integer('complexity_weight')->comment('Trọng số phức tạp (1-4)');
             $table->integer('quality_weight')->comment('Trọng số chất lượng (1-5)');
             $table->integer('result_level')->comment('Kết quả đạt được (1-4)');
             $table->decimal('result_score', 8, 4)->nullable()->comment('Điểm có trọng số chất lượng');

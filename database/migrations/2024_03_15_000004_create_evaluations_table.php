@@ -11,7 +11,7 @@ class CreateEvaluationsTable extends Migration
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('department_id');
+            $table->string('department')->nullable();
             $table->integer('month');
             $table->integer('year');
             $table->decimal('self_score', 5, 2)->nullable();
@@ -28,7 +28,6 @@ class CreateEvaluationsTable extends Migration
                 'completed'
             ])->default('pending');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
             

@@ -11,7 +11,7 @@ class Evaluation extends Model
 
     protected $fillable = [
         'user_id',
-        'department_id',
+        'department',
         'month',
         'year',
         'total_score',

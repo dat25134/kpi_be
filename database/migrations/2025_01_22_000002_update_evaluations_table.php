@@ -17,7 +17,7 @@ return new class extends Migration
             ]);
             
             // Thêm các cột mới (không có role_type)
-            $table->decimal('total_score', 5, 2)->nullable()->after('department_id');
+            $table->decimal('total_score', 5, 2)->nullable()->after('department');
             $table->enum('final_grade', ['A', 'B', 'C', 'D'])->nullable()->after('total_score');
             $table->enum('status', [
                 'draft',

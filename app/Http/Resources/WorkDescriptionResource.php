@@ -18,7 +18,6 @@ class WorkDescriptionResource extends JsonResource
             'task_description' => $this->task_description,
             'unit' => $this->unit,
             'target' => $this->target,
-            'complexity_weight' => $this->complexity_weight,
             'quality_weight' => $this->quality_weight,
             'result_level' => $this->result_level,
             'result_score' => $this->result_score,

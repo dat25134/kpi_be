@@ -95,7 +95,6 @@ class WorkDescriptionSampleSeeder extends Seeder
                         
                         'unit' => 'Thời gian hoàn thành',
                         'target' => 'Hoàn thành nhiệm vụ được giao',
-                        'complexity_weight' => $task->weight ?? 2, // Mặc định độ phức tạp trung bình
                         'quality_weight' => 3, // Mặc định trọng số chất lượng trung bình
                         'result_level' => $this->getResultLevelFromTaskStatus($task->status),
                         'result_score' => $this->calculateResultScore($task->status, 3),

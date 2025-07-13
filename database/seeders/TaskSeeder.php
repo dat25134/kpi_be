@@ -51,6 +51,11 @@ class TaskSeeder extends Seeder
                 'parent_id' => $parentId,
             ]);
 
+            if ($task->status == 'completed') {
+                $task->completed_at = now();
+                $task->save();
+            }
+
             $taskIds[] = $task->id;
 
             foreach ($collaborators as $userId) {

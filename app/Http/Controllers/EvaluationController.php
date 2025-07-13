@@ -73,4 +73,12 @@ class EvaluationController extends Controller
     {
         return $this->evaluationService->deleteEvaluation((int) $id);
     }
+
+    /**
+     * Lưu đánh giá với các chi tiết đánh giá và work descriptions
+     */
+    public function save(Request $request, $id)
+    {
+        return $this->evaluationService->saveEvaluation($request, (int) $id);
+    }
 } 
