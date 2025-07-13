@@ -37,4 +37,9 @@ interface EvaluationRepositoryInterface
      * Lấy phiếu đánh giá theo user và period
      */
     public function findByUserAndPeriod(int $userId, int $month, int $year): ?Evaluation;
+
+    /**
+     * Lưu đánh giá với các chi tiết đánh giá và work descriptions
+     */
+    public function saveEvaluation(Request $request, int $id, $user = null): bool;
 } 

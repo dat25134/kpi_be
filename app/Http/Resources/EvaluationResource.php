@@ -27,6 +27,7 @@ class EvaluationResource extends JsonResource
             'status' => $this->status,
             'final_grade' => $this->final_grade,
             'total_score' => $this->total_score,
+            'department' => $this->department,
         ];
         // Nếu là show (single resource), trả về chi tiết
         if ($this->resource instanceof \App\Models\Evaluation && $this->relationLoaded('evaluationDetails')) {

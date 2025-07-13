@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::group(['prefix' => 'evaluations'], function () {
             Route::get('/', [EvaluationController::class, 'index']);
             Route::get('/{id}', [EvaluationController::class, 'show']);
+            Route::post('/{id}/save', [EvaluationController::class, 'save']);
         });
     });
 
