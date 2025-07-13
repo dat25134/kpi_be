@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\EvaluationService;
+use App\Http\Requests\StoreEvaluationRequest;
 use Illuminate\Support\Facades\Auth;
 
 class EvaluationController extends Controller
@@ -77,7 +78,7 @@ class EvaluationController extends Controller
     /**
      * Lưu đánh giá với các chi tiết đánh giá và work descriptions
      */
-    public function save(Request $request, $id)
+    public function save(StoreEvaluationRequest $request, $id)
     {
         return $this->evaluationService->saveEvaluation($request, (int) $id);
     }

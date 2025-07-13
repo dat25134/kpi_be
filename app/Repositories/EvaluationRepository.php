@@ -217,6 +217,7 @@ class EvaluationRepository implements EvaluationRepositoryInterface
             // Chỉ lưu dữ liệu theo giai đoạn hiện tại
             switch ($status) {
                 case 'draft':
+                case 'submitted':
                     // Giai đoạn tự đánh giá - chỉ lưu self_score và self_comment
                     if (isset($detail['self_score'])) {
                         $detailData['self_score'] = $detail['self_score'];
@@ -271,37 +272,37 @@ class EvaluationRepository implements EvaluationRepositoryInterface
         }
     }
 
-    /**
-     * Lưu mô tả công việc
-     */
-    private function saveWorkDescriptions(int $evaluationId, array $workDescriptions): void
-    {
-        // Xóa các work descriptions cũ
-        \App\Models\WorkDescription::where('evaluation_id', $evaluationId)->delete();
+    // /**
+    //  * Lưu mô tả công việc
+    //  */
+    // private function saveWorkDescriptions(int $evaluationId, array $workDescriptions): void
+    // {
+    //     // Xóa các work descriptions cũ
+    //     \App\Models\WorkDescription::where('evaluation_id', $evaluationId)->delete();
 
-        foreach ($workDescriptions as $index => $workDesc) {
-            $workDescData = [
-                'evaluation_id' => $evaluationId,
-                'task_id' => $workDesc['task_id'] ?? null,
-                'task_title' => $workDesc['task_title'] ?? null,
-                'task_description' => $workDesc['task_description'] ?? null,
-                'task_status' => $workDesc['task_status'] ?? null,
-                'task_start_date' => $workDesc['task_start_date'] ?? null,
-                'task_due_date' => $workDesc['task_due_date'] ?? null,
-                'task_weight' => $workDesc['task_weight'] ?? null,
-                'unit' => $workDesc['unit'] ?? null,
-                'target' => $workDesc['target'],
-                'quality_weight' => $workDesc['quality_weight'],
-                'result_level' => $workDesc['result_level'],
-                'result_score' => $workDesc['result_score'] ?? null,
-                'final_score' => $workDesc['final_score'] ?? null,
-                'explanation' => $workDesc['explanation'] ?? null,
-                'order' => $index + 1,
-            ];
+    //     foreach ($workDescriptions as $index => $workDesc) {
+    //         $workDescData = [
+    //             'evaluation_id' => $evaluationId,
+    //             'task_id' => $workDesc['task_id'] ?? null,
+    //             'task_title' => $workDesc['task_title'] ?? null,
+    //             'task_description' => $workDesc['task_description'] ?? null,
+    //             'task_status' => $workDesc['task_status'] ?? null,
+    //             'task_start_date' => $workDesc['task_start_date'] ?? null,
+    //             'task_due_date' => $workDesc['task_due_date'] ?? null,
+    //             'task_weight' => $workDesc['task_weight'] ?? null,
+    //             'unit' => $workDesc['unit'] ?? null,
+    //             'target' => $workDesc['target'],
+    //             'quality_weight' => $workDesc['quality_weight'],
+    //             'result_level' => $workDesc['result_level'],
+    //             'result_score' => $workDesc['result_score'] ?? null,
+    //             'final_score' => $workDesc['final_score'] ?? null,
+    //             'explanation' => $workDesc['explanation'] ?? null,
+    //             'order' => $index + 1,
+    //         ];
 
-            \App\Models\WorkDescription::create($workDescData);
-        }
-    }
+    //         \App\Models\WorkDescription::create($workDescData);
+    //     }
+    // }
 
     /**
      * Cập nhật mô tả công việc (chỉ result_level và quality_weight)
@@ -330,72 +331,6 @@ class EvaluationRepository implements EvaluationRepositoryInterface
         }
     }
     */
-
-    /**
-     * Tính điểm cuối cùng dựa trên loại đánh giá
-     */
-    private function calculateFinalScore(array $detail): ?float
-    {
-        // Ưu tiên đánh giá cấp 2, sau đó cấp 1, cuối cùng là tự đánh giá
-        if (isset($detail['level2_score'])) {
-            return $detail['level2_score'];
-        }
-        
-        if (isset($detail['level1_score'])) {
-            return $detail['level1_score'];
-        }
-        
-        if (isset($detail['self_score'])) {
-            return $detail['self_score'];
-        }
-        
-        return null;
-    }
-
-    /**
-     * Gửi đánh giá (submit)
-     */
-    public function submitEvaluation(Request $request, int $id): bool
-    {
-        $evaluation = $this->model->find($id);
-        if (!$evaluation) {
-            return false;
-        }
-
-        // Kiểm tra xem đã có đủ dữ liệu để submit chưa
-        if (!$this->validateEvaluationForSubmission($evaluation)) {
-            throw new \InvalidArgumentException('Đánh giá chưa đủ dữ liệu để gửi. Vui lòng kiểm tra lại.');
-        }
-
-        return $evaluation->update(['status' => 'submitted']);
-    }
-
-    /**
-     * Kiểm tra tính hợp lệ của đánh giá trước khi submit
-     */
-    private function validateEvaluationForSubmission(Evaluation $evaluation): bool
-    {
-        // Kiểm tra xem có evaluation details không
-        $hasDetails = $evaluation->evaluationDetails()->exists();
-        if (!$hasDetails) {
-            return false;
-        }
-
-        // Kiểm tra xem có work descriptions không
-        $hasWorkDescriptions = $evaluation->workDescriptions()->exists();
-        if (!$hasWorkDescriptions) {
-            return false;
-        }
-
-        // Kiểm tra xem có ít nhất một loại đánh giá (self, level1, hoặc level2) không
-        $hasAnyScore = $evaluation->evaluationDetails()
-            ->whereNotNull('self_score')
-            ->orWhereNotNull('level1_score')
-            ->orWhereNotNull('level2_score')
-            ->exists();
-
-        return $hasAnyScore;
-    }
 
     /**
      * Kiểm tra quyền cập nhật work descriptions
