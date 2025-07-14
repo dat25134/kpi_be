@@ -134,8 +134,10 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             'assigner_id' => $data['assigner'],
             'status' => $data['status'],
             'quality_weight' => $data['qualityWeight'] ?? null,
-            'completed_at' => now(),
         ];
+        if ($data['status'] == 'completed' && $task->status != 'completed') {
+            $dataUpdate['completed_at'] = now();
+        }
         $dataCollaborators = $data['assignees'];
         $updateReason = $data['changeReason'] ?? 'Cập nhật task';
         

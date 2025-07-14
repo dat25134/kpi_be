@@ -38,70 +38,48 @@ class UserInfoSeeder extends Seeder
             ]);
         }
 
-        // Thêm thông tin cho User Test
-        $user = User::where('email', 'user@test.com')->first();
-        if ($user) {
-            UserInfo::create([
-                'user_id' => $user->id,
-                'birth_date' => '1995-05-15',
-                'avatar' => 'avatars/user.jpg',
-                'address' => 'Hồ Chí Minh, Việt Nam',
-                'education' => 'Cử nhân Công nghệ thông tin',
-                'experience' => '3 năm kinh nghiệm phát triển phần mềm',
-                'skills' => [
-                    'PHP',
-                    'Laravel',
-                    'Vue.js',
-                    'MySQL',
-                    'Git'
-                ],
-                'gender' => 'male',
-                'salary' => 20000000
-            ]);
-        }
-
-        // Thêm thông tin cho 30 nhân viên fake
-        $users = User::whereNotIn('email', ['admin@gmail.com', 'user@test.com'])->get();
+        // // Thêm thông tin cho 30 nhân viên fake
+        // $users = User::whereNotIn('email', ['admin@gmail.com', 'user@test.com'])->get();
         
-        $educations = [
-            'Cử nhân Công nghệ thông tin',
-            'Cử nhân Kinh tế',
-            'Cử nhân Marketing',
-            'Thạc sĩ Quản trị kinh doanh',
-            'Cử nhân Tài chính - Ngân hàng',
-            'Cử nhân Kế toán',
-            'Cử nhân Luật',
-            'Thạc sĩ Công nghệ thông tin'
-        ];
+        // $educations = [
+        //     'Cử nhân Công nghệ thông tin',
+        //     'Cử nhân Kinh tế',
+        //     'Cử nhân Marketing',
+        //     'Thạc sĩ Quản trị kinh doanh',
+        //     'Cử nhân Tài chính - Ngân hàng',
+        //     'Cử nhân Kế toán',
+        //     'Cử nhân Luật',
+        //     'Thạc sĩ Công nghệ thông tin'
+        // ];
 
-        $skillSets = [
-            ['PHP', 'Laravel', 'MySQL', 'Git', 'Docker'],
-            ['JavaScript', 'Vue.js', 'React', 'Node.js', 'MongoDB'],
-            ['Python', 'Django', 'PostgreSQL', 'AWS', 'Docker'],
-            ['Java', 'Spring Boot', 'Oracle', 'Maven', 'Jenkins'],
-            ['C#', '.NET', 'SQL Server', 'Azure', 'Visual Studio'],
-            ['Marketing', 'SEO', 'Google Analytics', 'Social Media', 'Content Creation'],
-            ['Sales', 'Customer Relationship', 'Negotiation', 'Market Research', 'CRM'],
-            ['Finance', 'Excel', 'Financial Analysis', 'Budgeting', 'Risk Management'],
-            ['HR', 'Recruitment', 'Employee Relations', 'Performance Management', 'HRIS'],
-            ['Design', 'Photoshop', 'Illustrator', 'Figma', 'UI/UX Design']
-        ];
+        // $skillSets = [
+        //     ['PHP', 'Laravel', 'MySQL', 'Git', 'Docker'],
+        //     ['JavaScript', 'Vue.js', 'React', 'Node.js', 'MongoDB'],
+        //     ['Python', 'Django', 'PostgreSQL', 'AWS', 'Docker'],
+        //     ['Java', 'Spring Boot', 'Oracle', 'Maven', 'Jenkins'],
+        //     ['C#', '.NET', 'SQL Server', 'Azure', 'Visual Studio'],
+        //     ['Marketing', 'SEO', 'Google Analytics', 'Social Media', 'Content Creation'],
+        //     ['Sales', 'Customer Relationship', 'Negotiation', 'Market Research', 'CRM'],
+        //     ['Finance', 'Excel', 'Financial Analysis', 'Budgeting', 'Risk Management'],
+        //     ['HR', 'Recruitment', 'Employee Relations', 'Performance Management', 'HRIS'],
+        //     ['Design', 'Photoshop', 'Illustrator', 'Figma', 'UI/UX Design']
+        // ];
 
-        foreach ($users as $user) {
-            $skills = $faker->randomElement($skillSets);
-            $salary = $faker->numberBetween(15000000, 80000000);
+        // foreach ($users as $user) {
+        //     $skills = $faker->randomElement($skillSets);
+        //     $salary = $faker->numberBetween(15000000, 80000000);
             
-            UserInfo::create([
-                'user_id' => $user->id,
-                'birth_date' => $faker->dateTimeBetween('-50 years', '-20 years'),
-                'avatar' => 'avatars/default.jpg',
-                'address' => $faker->address,
-                'education' => $faker->randomElement($educations),
-                'experience' => $faker->numberBetween(1, 15) . ' năm kinh nghiệm',
-                'skills' => $skills,
-                'gender' => $faker->randomElement(['male', 'female', 'other']),
-                'salary' => $salary
-            ]);
-        }
+        //     UserInfo::create([
+        //         'user_id' => $user->id,
+        //         'birth_date' => $faker->dateTimeBetween('-50 years', '-20 years'),
+        //         'avatar' => 'avatars/default.jpg',
+        //         'address' => $faker->address,
+        //         'education' => $faker->randomElement($educations),
+        //         'experience' => $faker->numberBetween(1, 15) . ' năm kinh nghiệm',
+        //         'skills' => $skills,
+        //         'gender' => $faker->randomElement(['male', 'female', 'other']),
+        //         'salary' => $salary
+        //     ]);
+        // }
     }
 } 

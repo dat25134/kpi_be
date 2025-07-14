@@ -30,26 +30,26 @@ class UserSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
 
-        // Tạo 30 nhân viên fake
-        $statuses = ['active', 'inactive'];
-        $departments = range(1, 20); // Có 20 departments từ seeder
+        // // Tạo 30 nhân viên fake
+        // $statuses = ['active', 'inactive'];
+        // $departments = range(1, 20); // Có 20 departments từ seeder
 
-        for ($i = 3; $i <= 32; $i++) {
-            $role = $faker->randomElement($roleData);
-            $status = $faker->randomElement($statuses);
-            $departmentId = $faker->randomElement($departments);
+        // for ($i = 3; $i <= 32; $i++) {
+        //     $role = $faker->randomElement($roleData);
+        //     $status = $faker->randomElement($statuses);
+        //     $departmentId = $faker->randomElement($departments);
             
-            $user = User::create([
-                'employee_id' => 'EMP' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                'name' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'phone' => $faker->phoneNumber,
-                'department_id' => $departmentId,
-                'status' => $status,
-                'join_date' => $faker->dateTimeBetween('-3 years', 'now'),
-                'password' => Hash::make('password'),
-            ]);
-            $user->assignRole($role);
-        }
+        //     $user = User::create([
+        //         'employee_id' => 'EMP' . str_pad($i, 3, '0', STR_PAD_LEFT),
+        //         'name' => $faker->name,
+        //         'email' => $faker->unique()->safeEmail,
+        //         'phone' => $faker->phoneNumber,
+        //         'department_id' => $departmentId,
+        //         'status' => $status,
+        //         'join_date' => $faker->dateTimeBetween('-3 years', 'now'),
+        //         'password' => Hash::make('password'),
+        //     ]);
+        //     $user->assignRole($role);
+        // }
     }
 }

@@ -57,7 +57,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         $totalEmployees = $this->model->count();
         $activeEmployees = $this->model->where('status', 'active')->count();
         $inactiveEmployees = $totalEmployees - $activeEmployees;
-        $joinedThisMonth = $this->model->whereMonth('join_date', now()->month)->count();
+        $joinedThisMonth = $this->model->whereMonth('join_date', now()->month)->whereYear('join_date', now()->year)->count();
 
         $departmentStats = DB::table('departments')
             ->leftJoin('users', 'departments.id', '=', 'users.department_id')

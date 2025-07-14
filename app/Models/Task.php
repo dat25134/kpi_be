@@ -24,6 +24,7 @@ class Task extends Model implements HasMedia
         'status',
         'created_by',
         'parent_id',
+        'completed_at'
     ];
 
     protected static $logAttributes = [
@@ -37,6 +38,7 @@ class Task extends Model implements HasMedia
         'main_assignee_id',
         'status',
         'created_by',
+        'completed_at'
     ];
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
