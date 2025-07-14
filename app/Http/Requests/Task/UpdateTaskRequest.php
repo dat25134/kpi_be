@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Task;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -30,7 +31,10 @@ class UpdateTaskRequest extends FormRequest
             'files.*' => 'file|max:10240', // 10MB mỗi file
             'changeReason' => 'required|string|min:10|max:500',
         ];
-        if ($this->input('status') === 'completed') {
+
+        $newStatus = $this->input('status');
+        $oldStatus = \App\Models\Task::find($this->id)->status ?? "in_progress";
+        if ($newStatus === 'completed' && $oldStatus === 'completed') {
             $rules['qualityWeight'] = 'required|in:1,2,3,4';
         }
         return $rules;

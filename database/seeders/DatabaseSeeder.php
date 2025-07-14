@@ -12,18 +12,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            DepartmentSeeder::class,
+            // DepartmentSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
             UserInfoSeeder::class,
-            ProjectSeeder::class,
+            // ProjectSeeder::class,
             ModulePermissionSeeder::class,
             PermissionSeeder::class,
             CategorySeeder::class,
-            TaskSeeder::class,
-            TaskProgressSeeder::class,
-            CategoryCriteriaSeeder::class,
-            EvaluationCriteriaSeeder::class,
+            // TaskSeeder::class,
+            // TaskProgressSeeder::class,
+            // CategoryCriteriaSeeder::class,
+            // EvaluationCriteriaSeeder::class,
             // EvaluationSampleSeeder::class,
             // WorkDescriptionSampleSeeder::class,
         ]);

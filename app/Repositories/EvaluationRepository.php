@@ -277,7 +277,7 @@ class EvaluationRepository implements EvaluationRepositoryInterface
         $evaluation->total_score = $totalScore;
 
         // Tính final_grade
-        if ($totalScore > 90) {
+        if ($totalScore >= 90) {
             $grade = 'A';
         } elseif ($totalScore >= 70) {
             $grade = 'B';

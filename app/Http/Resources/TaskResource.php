@@ -52,6 +52,12 @@ class TaskResource extends JsonResource
                     'id' => $subtask->id,
                     'status' => $subtask->status,
                     'content' => $subtask->content,
+                    'category' => $subtask->category,
+                    'department' => $subtask->department ? [
+                        'id' => $subtask->department->id,
+                        'name' => $subtask->department->name,
+                        'code' => $subtask->department->code,
+                    ] : null,
                     'startDate' => $subtask->start_date,
                     'deadline' => $subtask->due_date,
                     'mainHandler' => $subtask->mainAssignee,
@@ -64,6 +70,17 @@ class TaskResource extends JsonResource
                     'count' => $subtask->weight,
                     'qualityWeight' => $subtask->quality_weight,
                     'createdAt' => $subtask->created_at,
+                    "files" => $subtask->getMedia('task_files')->map(function ($media) {
+                        return [
+                            'id' => $media->id,
+                            'name' => $media->file_name,
+                            'url' => $media->getUrl(),
+                            'size' => $media->size,
+                            'mime_type' => $media->mime_type,
+                        ];
+                    }),
+                    "progressHistory"  => TaskProgressResource::collection($subtask->progressHistory),
+                    'description' => $subtask->description,
                 ];
             }),
         ];
