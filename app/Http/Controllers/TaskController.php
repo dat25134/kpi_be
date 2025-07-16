@@ -21,11 +21,20 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $tasks = $this->taskRepository->getTasksWithFilters($request->all());
-
-        // Lấy danh sách phòng ban có trong tasks của user hiện tại
-        $departments = $this->taskRepository->getUserTaskDepartments();
-        
+        $user = $request->user();
+        if ($user->can('project.view_all')) {
+            // Lấy tất cả task và tất cả phòng ban
+            $tasks = $this->taskRepository->getAllTasks($request->all());
+            $departments = $this->taskRepository->getAllDepartments();
+        } elseif ($user->can('project.view_related')) {
+            // Lấy task và phòng ban liên quan đến user
+            $tasks = $this->taskRepository->getRelatedTasks($user, $request->all());
+            $departments = $this->taskRepository->getUserTaskDepartments($user);
+        } else {
+            // Chỉ lấy task do user được giao (hoặc không cho xem)
+            $tasks = $this->taskRepository->getOwnTasks($user, $request->all());
+            $departments = $this->taskRepository->getUserTaskDepartments($user);
+        }
         return response()->json([
             'success' => true, 
             'message' => 'Lấy danh sách công việc thành công',
