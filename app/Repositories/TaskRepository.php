@@ -215,18 +215,187 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
     }
 
     /**
-     * Lấy danh sách phòng ban có trong tasks của user hiện tại
+     * Lấy tất cả task (không giới hạn user)
      */
-    public function getUserTaskDepartments(): array
+    public function getAllTasks(array $filters, int $limit = 10): LengthAwarePaginator
     {
-        $currentUserId = Auth::user()->id;
-        
-        $departments = Task::where(function ($q) use ($currentUserId) {
-            $q->where('main_assignee_id', $currentUserId)
-              ->orWhere('assigner_id', $currentUserId)
-              ->orWhere('created_by', $currentUserId)
-              ->orWhereHas('collaborators', function ($subQuery) use ($currentUserId) {
-                  $subQuery->where('user_id', $currentUserId);
+        $query = Task::with(['category', 'department', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user']);
+        // Apply filters giống getTasksWithFilters (trừ điều kiện user)
+        if (isset($filters['startDate'])) {
+            $query->whereDate('start_date', '>=', $filters['startDate']);
+        }
+        if (isset($filters['endDate'])) {
+            $query->whereDate('start_date', '<=', $filters['endDate']);
+        }
+        if (isset($filters['category'])) {
+            $query->where('category_id', $filters['category']);
+        }
+        if (isset($filters['departmentId'])) {
+            $query->where('department_id', $filters['departmentId']);
+        }
+        if (isset($filters['status'])) {
+            if ($filters['status'] == 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $filters['status']);
+            }
+        }
+        if (isset($filters['search'])) {
+            $query->where('content', 'like', "%{$filters['search']}%");
+        }
+        if (isset($filters['itemsPerPage'])) {
+            $limit = $filters['itemsPerPage'];
+        }
+        $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
+        $tasks = $query->get();
+        // Loại bỏ subtask mà user cũng có quyền xem task cha
+        $userTaskIds = $tasks->pluck('id')->toArray();
+        $visibleTasks = $tasks->filter(function($task) use ($userTaskIds) {
+            return is_null($task->parent_id) || !in_array($task->parent_id, $userTaskIds);
+        });
+        // Phân trang thủ công
+        $page = request('page', 1);
+        $perPage = $limit;
+        $paged = $visibleTasks->forPage($page, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paged,
+            $visibleTasks->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        return $paginator;
+    }
+
+    /**
+     * Lấy tất cả phòng ban
+     */
+    public function getAllDepartments(): array
+    {
+        return \App\Models\Department::select('id', 'name', 'code')->get()->toArray();
+    }
+
+    /**
+     * Lấy task liên quan đến user (assigner, main_assignee, creator, collaborator)
+     */
+    public function getRelatedTasks($user, array $filters, int $limit = 10): LengthAwarePaginator
+    {
+        $query = Task::with(['category', 'department', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user'])
+            ->where(function ($q) use ($user) {
+                $q->where('main_assignee_id', $user->id)
+                  ->orWhere('assigner_id', $user->id)
+                  ->orWhere('created_by', $user->id)
+                  ->orWhereHas('collaborators', function ($subQuery) use ($user) {
+                      $subQuery->where('user_id', $user->id);
+                  });
+            });
+        if (isset($filters['startDate'])) {
+            $query->whereDate('start_date', '>=', $filters['startDate']);
+        }
+        if (isset($filters['endDate'])) {
+            $query->whereDate('start_date', '<=', $filters['endDate']);
+        }
+        if (isset($filters['category'])) {
+            $query->where('category_id', $filters['category']);
+        }
+        if (isset($filters['departmentId'])) {
+            $query->where('department_id', $filters['departmentId']);
+        }
+        if (isset($filters['status'])) {
+            if ($filters['status'] == 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $filters['status']);
+            }
+        }
+        if (isset($filters['search'])) {
+            $query->where('content', 'like', "%{$filters['search']}%");
+        }
+        if (isset($filters['itemsPerPage'])) {
+            $limit = $filters['itemsPerPage'];
+        }
+        $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
+        $tasks = $query->get();
+        $userTaskIds = $tasks->pluck('id')->toArray();
+        $visibleTasks = $tasks->filter(function($task) use ($userTaskIds) {
+            return is_null($task->parent_id) || !in_array($task->parent_id, $userTaskIds);
+        });
+        $page = request('page', 1);
+        $perPage = $limit;
+        $paged = $visibleTasks->forPage($page, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paged,
+            $visibleTasks->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        return $paginator;
+    }
+
+    /**
+     * Lấy task do user được giao (main_assignee)
+     */
+    public function getOwnTasks($user, array $filters, int $limit = 10): LengthAwarePaginator
+    {
+        $query = Task::with(['category', 'department', 'assigner', 'mainAssignee', 'collaborators', 'progressHistory.user'])
+            ->where('main_assignee_id', $user->id);
+        if (isset($filters['startDate'])) {
+            $query->whereDate('start_date', '>=', $filters['startDate']);
+        }
+        if (isset($filters['endDate'])) {
+            $query->whereDate('start_date', '<=', $filters['endDate']);
+        }
+        if (isset($filters['category'])) {
+            $query->where('category_id', $filters['category']);
+        }
+        if (isset($filters['departmentId'])) {
+            $query->where('department_id', $filters['departmentId']);
+        }
+        if (isset($filters['status'])) {
+            if ($filters['status'] == 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $filters['status']);
+            }
+        }
+        if (isset($filters['search'])) {
+            $query->where('content', 'like', "%{$filters['search']}%");
+        }
+        if (isset($filters['itemsPerPage'])) {
+            $limit = $filters['itemsPerPage'];
+        }
+        $query->orderBy('created_at', 'desc')->orderBy('content', 'asc');
+        $tasks = $query->get();
+        $userTaskIds = $tasks->pluck('id')->toArray();
+        $visibleTasks = $tasks->filter(function($task) use ($userTaskIds) {
+            return is_null($task->parent_id) || !in_array($task->parent_id, $userTaskIds);
+        });
+        $page = request('page', 1);
+        $perPage = $limit;
+        $paged = $visibleTasks->forPage($page, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paged,
+            $visibleTasks->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        return $paginator;
+    }
+
+    /**
+     * Lấy danh sách phòng ban có trong tasks của user hiện tại (có thể truyền user)
+     */
+    public function getUserTaskDepartments($user = null): array
+    {
+        $user = $user ?: Auth::user();
+        $departments = Task::where(function ($q) use ($user) {
+            $q->where('main_assignee_id', $user->id)
+              ->orWhere('assigner_id', $user->id)
+              ->orWhere('created_by', $user->id)
+              ->orWhereHas('collaborators', function ($subQuery) use ($user) {
+                  $subQuery->where('user_id', $user->id);
               });
         })
         ->whereNotNull('department_id')
@@ -243,7 +412,6 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
             ];
         })
         ->toArray();
-
         return $departments;
     }
 }
