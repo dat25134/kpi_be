@@ -43,6 +43,7 @@ class UserProfileResource extends JsonResource
                 'displayName' => optional($this->roles->first())->display_name,
                 'color' => optional($this->roles->first())->color,
             ],
+            'permissions' => $this->getPermissionsViaRoles()->pluck('name'),
         ];
     }
 
