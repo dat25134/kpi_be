@@ -17,6 +17,7 @@ class UserInfoResource extends JsonResource
             'avatarUrl' => $avatarUrl,
             'email' => $this->email,
             'role' => $this->getRoleNames()->first(),
+            'permissions' => $this->getAllPermissions()->pluck('name'),
             'department' => $this->department ? [
                 'id' => $this->department->id,
                 'name' => $this->department->name,
