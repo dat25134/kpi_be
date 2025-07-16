@@ -59,6 +59,25 @@ class TaskController extends Controller
 
     public function store(TaskStoreRequest $request)
     {
+        $user = $request->user();
+        $isSubTask = $request->filled('parent_id') && $request->parent_id !== null;
+
+        if ($isSubTask) {
+            if (!$user->can('project.create_sub')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn không có quyền tạo sub-task!'
+                ], 403);
+            }
+        } else {
+            if (!$user->can('project.create')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn không có quyền tạo task!'
+                ], 403);
+            }
+        }
+
         $task = $this->taskRepository->createTask($request->all());
         if ($task) {
             return response()->json([
@@ -66,7 +85,7 @@ class TaskController extends Controller
                 'message' => 'Tạo task thành công',
                 'data' => new TaskResource($task),
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => false,
                 'message' => 'Tạo task thất bại',
