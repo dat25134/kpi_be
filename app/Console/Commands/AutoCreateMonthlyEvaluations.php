@@ -81,14 +81,10 @@ class AutoCreateMonthlyEvaluations extends Command
                 $this->info("Tạo phiếu đánh giá cho user {$user->name} - có {$tasks->count()} tasks cần đánh giá");
                 
                 // Tạo phiếu đánh giá
-                $evaluation = Evaluation::firstOrCreate([
-                    'user_id' => $user->id,
-                    'month'   => $month,
-                    'year'    => $year,
-                ], [
+                $evaluation = Evaluation::firstOrCreate($this->getEvaluationData($user, $month, $year, $user->roles->first()->name), [
                     'department' => $user->department->name ?? null,
                     'status' => 'draft',
-                ]);
+                ]); 
 
                 // Bổ sung evaluation_details cho các tiêu chí hiện hành nếu chưa có
                 $criteriaIds = EvaluationCriteria::where('is_active', true)
@@ -151,5 +147,34 @@ class AutoCreateMonthlyEvaluations extends Command
         DB::commit();
         
         $this->info('Hoàn thành tạo phiếu đánh giá tự động cho tháng ' . $month . '/' . $year);
+    }
+
+    public function getEvaluationData($user, $month, $year, $role)
+    {
+        if ($role == 'nhanvien') {
+            $creatorRole = 'nhanvien';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'chutich';
+        } elseif ($role == 'truongphong') {
+            $creatorRole = 'truongphong';
+            $level1ApproverRole = 'phochutich';
+            $level2ApproverRole = 'chutich';
+        } elseif ($role == 'phophong') {
+            $creatorRole = 'phophong';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'phochutich';
+        } elseif ($role == 'chuyenvien') {
+            $creatorRole = 'chuyenvien';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'chutich';
+        }
+        return [
+            'user_id' => $user->id,
+            'month'   => $month,
+            'year'    => $year,
+            'creator_role' => $creatorRole,
+            'level1_approver_role' => $level1ApproverRole,
+            'level2_approver_role' => $level2ApproverRole,
+        ];
     }
 }

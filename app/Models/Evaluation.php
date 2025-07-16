@@ -16,7 +16,10 @@ class Evaluation extends Model
         'year',
         'total_score',
         'final_grade',
-        'status'
+        'status',
+        'creator_role',
+        'level1_approver_role',
+        'level2_approver_role'
     ];
 
     protected $casts = [

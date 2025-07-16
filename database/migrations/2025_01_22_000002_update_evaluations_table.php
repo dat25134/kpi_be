@@ -26,6 +26,9 @@ return new class extends Migration
                 'level2_approved',
                 'completed'
             ])->default('draft')->change();
+            $table->string('creator_role')->nullable()->after('status');
+            $table->string('level1_approver_role')->nullable()->after('creator_role');
+            $table->string('level2_approver_role')->nullable()->after('level1_approver_role');
         });
     }
 

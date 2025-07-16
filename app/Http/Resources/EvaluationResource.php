@@ -28,6 +28,9 @@ class EvaluationResource extends JsonResource
             'final_grade' => $this->final_grade,
             'total_score' => $this->total_score,
             'department' => $this->department,
+            'creator_role' => $this->creator_role,
+            'level1_approver_role' => $this->level1_approver_role,
+            'level2_approver_role' => $this->level2_approver_role,
         ];
         // Nếu là show (single resource), trả về chi tiết
         if ($this->resource instanceof \App\Models\Evaluation && $this->relationLoaded('evaluationDetails')) {
