@@ -80,6 +80,52 @@ class EvaluationController extends Controller
      */
     public function save(StoreEvaluationRequest $request, $id)
     {
+        $user = $request->user();
+        $canSelfEvaluate = $user->can('evaluation.save');
+        $canApprove = $user->can('evaluation.approve');
+        $status = $request->input('status');
+
+        if (!$canSelfEvaluate && !$canApprove) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này!'
+            ], 403);
+        }
+        
+
+        // Các trạng thái cho từng quyền
+        $selfStatuses = ['draft', 'submitted'];
+        $approveStatuses = ['level1_approved', 'level2_approved', 'completed'];
+
+        if ($status) {
+            if (in_array($status, $selfStatuses) && !$canSelfEvaluate) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn không có quyền tự đánh giá!'
+                ], 403);
+            }
+            if (in_array($status, $approveStatuses) && !$canApprove) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn không có quyền duyệt phiếu đánh giá!'
+                ], 403);
+            }
+            // Nếu status không thuộc bất kỳ nhóm nào, không cho phép
+            if (!in_array($status, array_merge($selfStatuses, $approveStatuses))) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Trạng thái không hợp lệ!'
+                ], 422);
+            }
+        } else {
+            // Nếu không truyền status, không cho phép
+            return response()->json([
+                'status' => false,
+                'message' => 'Thiếu trạng thái đánh giá!'
+            ], 422);
+        }
+
+        // Gọi service xử lý như cũ
         return $this->evaluationService->saveEvaluation($request, (int) $id);
     }
 } 

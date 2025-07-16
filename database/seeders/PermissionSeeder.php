@@ -32,7 +32,7 @@ class PermissionSeeder extends Seeder
 
             // Đánh giá
             [ 'name' => 'evaluation.view', 'display_name' => 'Xem phiếu đánh giá', 'module' => 'Evaluation', 'category' => 'Xem', 'description' => 'Xem phiếu đánh giá' ],
-            [ 'name' => 'evaluation.create', 'display_name' => 'Tạo phiếu đánh giá', 'module' => 'Evaluation', 'category' => 'Tạo', 'description' => 'Tạo phiếu đánh giá' ],
+            [ 'name' => 'evaluation.save', 'display_name' => 'Tự đánh giá', 'module' => 'Evaluation', 'category' => 'Tự đánh giá', 'description' => 'Tự đánh giá' ],
             [ 'name' => 'evaluation.approve', 'display_name' => 'Duyệt phiếu đánh giá', 'module' => 'Evaluation', 'category' => 'Duyệt', 'description' => 'Duyệt phiếu đánh giá (chỉ dành cho cấp Trưởng phòng, Phó Phòng, Phó Chủ tịch, Chủ tịch)' ],
             [ 'name' => 'evaluation_criteria.manage', 'display_name' => 'Quản lý tiêu chí đánh giá', 'module' => 'Evaluation', 'category' => 'Quản lý', 'description' => 'Toàn quyền xử lý tiêu chí đánh giá (xem, thêm, sửa, xóa)' ],
 
