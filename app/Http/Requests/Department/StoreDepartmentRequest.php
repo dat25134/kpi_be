@@ -19,6 +19,8 @@ class StoreDepartmentRequest extends FormRequest
             'description' => 'nullable|string',
             'manager_id' => 'nullable|exists:users,id',
             'status' => 'nullable|in:active,inactive',
+            'employee_ids' => 'nullable|array',
+            'employee_ids.*' => 'exists:users,id',
         ];
     }
 
@@ -35,6 +37,8 @@ class StoreDepartmentRequest extends FormRequest
             'description.string' => 'Mô tả phải là chuỗi ký tự.',
             'manager_id.exists' => 'Trưởng phòng không tồn tại.',
             'status.in' => 'Trạng thái phải là active hoặc inactive.',
+            'employee_ids.array' => 'Danh sách nhân viên phải là một mảng.',
+            'employee_ids.*.exists' => 'Nhân viên được chọn không tồn tại.',
         ];
     }
 } 

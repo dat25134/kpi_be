@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\User;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentRepository extends BaseRepository implements DepartmentRepositoryInterface
 {
@@ -78,5 +79,19 @@ class DepartmentRepository extends BaseRepository implements DepartmentRepositor
     public function listDepartmentToSelect()
     {
         return $this->model->get(['id', 'name']);
+    }
+
+    /**
+     * Gán danh sách nhân viên vào phòng ban (không xử lý transaction ở đây)
+     */
+    public function assignEmployees($departmentId, array $employeeIds)
+    {
+        // Xóa department_id của các user thuộc phòng ban này nhưng không còn trong danh sách mới
+        \App\Models\User::where('department_id', $departmentId)
+            ->whereNotIn('id', $employeeIds)
+            ->update(['department_id' => null]);
+        // Gán department_id cho các user mới
+        \App\Models\User::whereIn('id', $employeeIds)
+            ->update(['department_id' => $departmentId]);
     }
 }

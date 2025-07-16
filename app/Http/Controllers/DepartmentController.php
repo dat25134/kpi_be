@@ -6,6 +6,7 @@ use App\Http\Requests\Department\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Repositories\DepartmentRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentController extends Controller
 {
@@ -47,24 +48,46 @@ class DepartmentController extends Controller
 
     public function store(StoreDepartmentRequest $request)
     {
-        $department = $this->departmentRepository->create($request->all());
+        DB::beginTransaction();
+        try {
+            $department = $this->departmentRepository->create($request->all());
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Tạo phòng ban thành công',
-            'data'    => new DepartmentResource($department->fresh(['manager', 'employees'])),
-        ], 201);
+            if ($request->has('employee_ids') && is_array($request->employee_ids)) {
+                $this->departmentRepository->assignEmployees($department->id, $request->employee_ids);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status'  => true,
+                'message' => 'Tạo phòng ban thành công',
+                'data'    => new DepartmentResource($department->fresh(['manager', 'employees'])),
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => 'Lỗi: ' . $e->getMessage()], 500);
+        }
     }
 
     public function update(UpdateDepartmentRequest $request, $id)
     {
-        $department = $this->departmentRepository->update($id, $request->all());
+        DB::beginTransaction();
+        try {
+            $department = $this->departmentRepository->update($id, $request->all());
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Cập nhật phòng ban thành công',
-            'data'    => new DepartmentResource($department->fresh(['manager', 'employees'])),
-        ]);
+            if ($request->has('employee_ids') && is_array($request->employee_ids)) {
+                $this->departmentRepository->assignEmployees($department->id, $request->employee_ids);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status'  => true,
+                'message' => 'Cập nhật phòng ban thành công',
+                'data'    => new DepartmentResource($department->fresh(['manager', 'employees'])),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => 'Lỗi: ' . $e->getMessage()], 500);
+        }
     }
 
     public function destroy($id)

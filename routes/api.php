@@ -25,6 +25,7 @@ Route::get('categories', [CategoryController::class, 'index']);
 Route::get('roles/selection', [RoleController::class, 'selection']);
 Route::get('permissions', [PermissionController::class, 'index']);
 Route::get('permissions/permission-modules', [PermissionController::class, 'modulePermission']);
+Route::get('employees/manager', [EmployeeController::class, 'manager']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -67,7 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Employee (hr.* permissions)
     Route::prefix('employees')->group(function () {
-        Route::middleware('permission:hr.view')->get('/manager', [EmployeeController::class, 'manager']);
         Route::middleware('permission:hr.view')->get('/', [EmployeeController::class, 'employees']);
         Route::middleware('permission:hr.view')->get('/summary', [EmployeeController::class, 'summary']);
         Route::middleware('permission:hr.create')->post('/', [EmployeeController::class, 'store']);
