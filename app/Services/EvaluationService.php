@@ -7,6 +7,8 @@ use App\Http\Resources\EvaluationResource;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EvaluationService
 {
@@ -199,5 +201,165 @@ class EvaluationService
         } catch (\Exception $e) {
             return response()->json(['message' => 'Có lỗi xảy ra khi cập nhật Bảng mô tả công việc cho đánh giá'], 500);
         }
+    }
+
+    /**
+     * Tạo phiếu đánh giá cho user hiện tại (thủ công)
+     */
+    public function manualCreateEvaluation($user, $month = null, $year = null)
+    {
+        try {
+            // $month, $year đã được validate ở form request
+            $now = Carbon::create($year, $month, 25, 0, 0, 0);
+
+            // Kiểm tra đã có phiếu đánh giá chưa (kể cả soft delete)
+            $exists = \App\Models\Evaluation::withTrashed()
+                ->where('user_id', $user->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->where('deleted_at', null)
+                ->exists();
+            if ($exists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Phiếu đánh giá đã tồn tại không thể tạo'
+                ], 409);
+            }
+
+            // Lấy các task user là collaborator
+            $taskIdsAsCollaborator = DB::table('task_collaborators')
+                ->where('user_id', $user->id)
+                ->pluck('task_id')
+                ->toArray();
+
+            // Lấy công việc cần đánh giá với tất cả vai trò liên quan
+            $tasks = \App\Models\Task::where(function ($q) use ($user, $taskIdsAsCollaborator) {
+                    $q->where('main_assignee_id', $user->id)
+                      ->orWhere('assigner_id', $user->id)
+                      ->orWhere('created_by', $user->id);
+                    if (!empty($taskIdsAsCollaborator)) {
+                        $q->orWhereIn('id', $taskIdsAsCollaborator);
+                    }
+                })
+                ->where(function ($q) use ($month, $year, $now) {
+                    $q->where(function ($q2) use ($month, $year) {
+                        $q2->where('status', 'completed')
+                            ->whereMonth('completed_at', $month)
+                            ->whereYear('completed_at', $year);
+                    })
+                    ->orWhere(function ($q2) use ($now) {
+                        $q2->where('status', '!=', 'completed')
+                            ->where('due_date', '<', $now);
+                    });
+                })
+                ->distinct()
+                ->get();
+
+            if ($tasks->count() === 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không có công việc nào cần đánh giá trong tháng này.'
+                ], 200);
+            }
+
+            DB::beginTransaction();
+
+            // Tạo phiếu đánh giá
+            $role = $user->roles->first()->name;
+            $evaluationData = $this->getEvaluationData($user, $month, $year, $role);
+            $evaluation = \App\Models\Evaluation::firstOrCreate($evaluationData, [
+                'department' => $user->department->name ?? null,
+                'status' => 'draft',
+            ]);
+
+            // Bổ sung evaluation_details cho các tiêu chí hiện hành nếu chưa có
+            $criteriaIds = \App\Models\EvaluationCriteria::where('is_active', true)
+                ->where('role_id', $user->roles->first()->id)
+                ->pluck('id')
+                ->toArray();
+            $existingDetailIds = \App\Models\EvaluationDetail::where('evaluation_id', $evaluation->id)
+                ->pluck('criteria_id')
+                ->toArray();
+            $missingCriteriaIds = array_diff($criteriaIds, $existingDetailIds);
+            foreach ($missingCriteriaIds as $criteriaId) {
+                \App\Models\EvaluationDetail::create([
+                    'evaluation_id' => $evaluation->id,
+                    'criteria_id' => $criteriaId,
+                ]);
+            }
+
+            // Tạo work descriptions cho từng task
+            foreach ($tasks as $task) {
+                $result_level = 1;
+                if ($task->status == 'completed' && $task->completed_at <= $task->due_date) {
+                    $result_level = 3;
+                } elseif ($task->status == 'completed' && $task->completed_at > $task->due_date) {
+                    $result_level = 2;
+                }
+                $qualityWeight = $task->quality_weight ?? 2;
+                \App\Models\WorkDescription::updateOrCreate([
+                    'evaluation_id' => $evaluation->id,
+                    'task_id' => $task->id,
+                ], [
+                    'task_title' => $task->content,
+                    'task_description' => $task->description ?? null,
+                    'task_status' => $task->status,
+                    'task_start_date' => $task->start_date,
+                    'task_due_date' => $task->due_date,
+                    'task_weight' => $task->weight,
+                    'unit' => 'Thời gian HT',
+                    'target' => $task->due_date,
+                    'quality_weight' => $qualityWeight,
+                    'result_level' => $result_level,
+                    'result_score' => ($result_level * $qualityWeight) / 5,
+                    'final_score' => ($result_level * $qualityWeight) / 5 * $task->weight,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Tạo phiếu đánh giá thành công',
+                'evaluation_id' => $evaluation->id
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra khi tạo phiếu đánh giá',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Copy từ AutoCreateMonthlyEvaluations
+    public function getEvaluationData($user, $month, $year, $role)
+    {
+        if ($role == 'nhanvien') {
+            $creatorRole = 'nhanvien';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'chutich';
+        } elseif ($role == 'truongphong') {
+            $creatorRole = 'truongphong';
+            $level1ApproverRole = 'phochutich';
+            $level2ApproverRole = 'chutich';
+        } elseif ($role == 'phophong') {
+            $creatorRole = 'phophong';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'phochutich';
+        } elseif ($role == 'chuyenvien') {
+            $creatorRole = 'chuyenvien';
+            $level1ApproverRole = 'truongphong';
+            $level2ApproverRole = 'chutich';
+        }
+        return [
+            'user_id' => $user->id,
+            'month'   => $month,
+            'year'    => $year,
+            'creator_role' => $creatorRole,
+            'level1_approver_role' => $level1ApproverRole,
+            'level2_approver_role' => $level2ApproverRole,
+        ];
     }
 } 

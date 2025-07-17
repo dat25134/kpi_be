@@ -329,15 +329,31 @@ class EvaluationRepository implements EvaluationRepositoryInterface
     {
         foreach ($workDescriptions as $workDesc) {
             $updateData = [];
-            
+            $needRecalc = false;
             // Chỉ cập nhật nếu có dữ liệu
             if (isset($workDesc['result_level'])) {
                 $updateData['result_level'] = $workDesc['result_level'];
+                $needRecalc = true;
             }
             if (isset($workDesc['quality_weight'])) {
                 $updateData['quality_weight'] = $workDesc['quality_weight'];
+                $needRecalc = true;
             }
-            
+            // Nếu cần tính lại điểm
+            if ($needRecalc) {
+                $work = \App\Models\WorkDescription::where('evaluation_id', $evaluationId)
+                    ->where('id', $workDesc['id'])
+                    ->first();
+                if ($work) {
+                    $result_level = $updateData['result_level'] ?? $work->result_level;
+                    $quality_weight = $updateData['quality_weight'] ?? $work->quality_weight;
+                    $task_weight = $work->task_weight;
+                    $result_score = ($result_level * $quality_weight) / 5;
+                    $final_score = $result_score * $task_weight;
+                    $updateData['result_score'] = $result_score;
+                    $updateData['final_score'] = $final_score;
+                }
+            }
             // Chỉ cập nhật nếu có dữ liệu để cập nhật
             if (!empty($updateData)) {
                 \App\Models\WorkDescription::where('evaluation_id', $evaluationId)

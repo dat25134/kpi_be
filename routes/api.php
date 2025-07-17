@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:project.create')->post('/', [TaskController::class, 'store']);
         Route::middleware('permission:project.edit')->post('/{id}', [TaskController::class, 'update']);
         // Route::delete('/{id}', [TaskController::class, 'destroy']);
-        Route::middleware('permission:project.track')->post('/{taskId}/progress', [TaskProgressController::class, 'store']);
+        Route::middleware('permission:project.update_progress')->post('/{taskId}/progress', [TaskProgressController::class, 'store']);
         Route::middleware('permission:project.edit')->delete('/{taskId}/files/{id}', [TaskController::class, 'deleteFile']);
         // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);
     });
@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:evaluation.save|evaluation.approve')->post('/{id}/save', [EvaluationController::class, 'save']);
         Route::middleware('permission:evaluation.approve')->put('/{id}/work-descriptions', [EvaluationController::class, 'updateWorkDescriptions']);
         Route::middleware('permission:evaluation.view')->delete('/{id}', [EvaluationController::class, 'destroy']);
+        Route::middleware('permission:evaluation.view')->post('/manual-create-evaluation', [EvaluationController::class, 'manualCreateEvaluation']);
     });
 
     // Department (department.* permissions)
