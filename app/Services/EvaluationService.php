@@ -163,4 +163,27 @@ class EvaluationService
             return response()->json(['message' => 'Có lỗi xảy ra khi lưu đánh giá'], 500);
         }
     }
+
+    /**
+     * Cập nhật work descriptions cho evaluation
+     */
+    public function updateWorkDescriptions(int $evaluationId, array $workDescriptions, $user): JsonResponse
+    {
+        try {
+            $evaluation = $this->evaluationRepository->findById($evaluationId);
+            if (!$evaluation) {
+                return response()->json(['message' => 'Không tìm thấy phiếu đánh giá'], 404);
+            }
+            if (!$this->evaluationRepository->canUpdateWorkDescriptions($user, $evaluation)) {
+                return response()->json(['message' => 'Bạn không có quyền cập nhật Bảng mô tả công việc cho đánh giá'], 403);
+            }
+            $this->evaluationRepository->updateWorkDescriptions($evaluationId, $workDescriptions);
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật Bảng mô tả công việc cho đánh giá thành công'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Có lỗi xảy ra khi cập nhật Bảng mô tả công việc cho đánh giá'], 500);
+        }
+    }
 } 

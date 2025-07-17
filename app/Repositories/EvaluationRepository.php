@@ -163,14 +163,13 @@ class EvaluationRepository implements EvaluationRepositoryInterface
 
             // Cập nhật work descriptions (chỉ cấp 1 mới có quyền)
             // TODO: Tạm thời comment để tập trung vào chức năng đánh giá theo từng cấp
-            /*
             if ($request->has('work_descriptions')) {
                 if (!$this->canUpdateWorkDescriptions($user, $evaluation)) {
                     throw new \InvalidArgumentException('Bạn không có quyền cập nhật work descriptions');
                 }
                 $this->updateWorkDescriptions($evaluation->id, $request->input('work_descriptions'));
             }
-            */
+
 
             DB::commit();
             return true;
@@ -290,44 +289,43 @@ class EvaluationRepository implements EvaluationRepositoryInterface
         $evaluation->save();
     }
 
-    // /**
-    //  * Lưu mô tả công việc
-    //  */
-    // private function saveWorkDescriptions(int $evaluationId, array $workDescriptions): void
-    // {
-    //     // Xóa các work descriptions cũ
-    //     \App\Models\WorkDescription::where('evaluation_id', $evaluationId)->delete();
+    /**
+     * Lưu mô tả công việc
+     */
+    private function saveWorkDescriptions(int $evaluationId, array $workDescriptions): void
+    {
+        // Xóa các work descriptions cũ
+        \App\Models\WorkDescription::where('evaluation_id', $evaluationId)->delete();
 
-    //     foreach ($workDescriptions as $index => $workDesc) {
-    //         $workDescData = [
-    //             'evaluation_id' => $evaluationId,
-    //             'task_id' => $workDesc['task_id'] ?? null,
-    //             'task_title' => $workDesc['task_title'] ?? null,
-    //             'task_description' => $workDesc['task_description'] ?? null,
-    //             'task_status' => $workDesc['task_status'] ?? null,
-    //             'task_start_date' => $workDesc['task_start_date'] ?? null,
-    //             'task_due_date' => $workDesc['task_due_date'] ?? null,
-    //             'task_weight' => $workDesc['task_weight'] ?? null,
-    //             'unit' => $workDesc['unit'] ?? null,
-    //             'target' => $workDesc['target'],
-    //             'quality_weight' => $workDesc['quality_weight'],
-    //             'result_level' => $workDesc['result_level'],
-    //             'result_score' => $workDesc['result_score'] ?? null,
-    //             'final_score' => $workDesc['final_score'] ?? null,
-    //             'explanation' => $workDesc['explanation'] ?? null,
-    //             'order' => $index + 1,
-    //         ];
+        foreach ($workDescriptions as $index => $workDesc) {
+            $workDescData = [
+                'evaluation_id' => $evaluationId,
+                'task_id' => $workDesc['task_id'] ?? null,
+                'task_title' => $workDesc['task_title'] ?? null,
+                'task_description' => $workDesc['task_description'] ?? null,
+                'task_status' => $workDesc['task_status'] ?? null,
+                'task_start_date' => $workDesc['task_start_date'] ?? null,
+                'task_due_date' => $workDesc['task_due_date'] ?? null,
+                'task_weight' => $workDesc['task_weight'] ?? null,
+                'unit' => $workDesc['unit'] ?? null,
+                'target' => $workDesc['target'],
+                'quality_weight' => $workDesc['quality_weight'],
+                'result_level' => $workDesc['result_level'],
+                'result_score' => $workDesc['result_score'] ?? null,
+                'final_score' => $workDesc['final_score'] ?? null,
+                'explanation' => $workDesc['explanation'] ?? null,
+                'order' => $index + 1,
+            ];
 
-    //         \App\Models\WorkDescription::create($workDescData);
-    //     }
-    // }
+            \App\Models\WorkDescription::create($workDescData);
+        }
+    }
 
     /**
      * Cập nhật mô tả công việc (chỉ result_level và quality_weight)
      */
-    // TODO: Tạm thời comment để tập trung vào chức năng đánh giá theo từng cấp
-    /*
-    private function updateWorkDescriptions(int $evaluationId, array $workDescriptions): void
+    
+    public function updateWorkDescriptions(int $evaluationId, array $workDescriptions): void
     {
         foreach ($workDescriptions as $workDesc) {
             $updateData = [];
@@ -348,28 +346,25 @@ class EvaluationRepository implements EvaluationRepositoryInterface
             }
         }
     }
-    */
+
 
     /**
      * Kiểm tra quyền cập nhật work descriptions
      */
-    // TODO: Tạm thời comment để tập trung vào chức năng đánh giá theo từng cấp
-    /*
-    private function canUpdateWorkDescriptions($user, Evaluation $evaluation): bool
+
+    public function canUpdateWorkDescriptions($user, Evaluation $evaluation): bool
     {
         if (!$user) {
             return false;
         }
 
-        // Chỉ cấp 1 (trưởng phòng) mới có quyền cập nhật work descriptions
+        // Chỉ user có role đúng với level1_approver_role mới có quyền cập nhật work descriptions
         $userRole = $user->roles->first();
-        if (!$userRole || $userRole->name !== 'truongphong') {
+        if (!$userRole || $userRole->name !== $evaluation->level1_approver_role) {
             return false;
         }
 
-        // Kiểm tra xem user có phải là trưởng phòng của nhân viên được đánh giá không
-        // (có thể thêm logic kiểm tra phòng ban nếu cần)
+        // (Có thể bổ sung kiểm tra phòng ban hoặc các điều kiện khác ở đây)
         return true;
     }
-    */
 }

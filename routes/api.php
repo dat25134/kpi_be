@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:evaluation.view')->get('/', [EvaluationController::class, 'index']);
         Route::middleware('permission:evaluation.view')->get('/{id}', [EvaluationController::class, 'show']);
         Route::middleware('permission:evaluation.save|evaluation.approve')->post('/{id}/save', [EvaluationController::class, 'save']);
+        Route::middleware('permission:evaluation.approve')->put('/{id}/work-descriptions', [EvaluationController::class, 'updateWorkDescriptions']);
     });
 
     // Department (department.* permissions)
