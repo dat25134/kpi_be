@@ -112,12 +112,26 @@ class EvaluationService
     public function deleteEvaluation(int $id): JsonResponse
     {
         try {
+            $evaluation = $this->evaluationRepository->findById($id);
+            if (!$evaluation) {
+                return response()->json(['message' => 'Không tìm thấy phiếu đánh giá để xóa'], 404);
+            }
+            // Kiểm tra quyền sở hữu
+            $currentUser = request()->user();
+            if (!$currentUser || $evaluation->user_id !== $currentUser->id) {
+                return response()->json([
+                    'message' => 'Bạn không có quyền xóa phiếu đánh giá này'
+                ], 403);
+            }
+            if (!in_array($evaluation->status, ['draft', 'submitted'])) {
+                return response()->json([
+                    'message' => 'Bạn không thể xóa khi phiếu đã được duyệt'
+                ], 403);
+            }
             $success = $this->evaluationRepository->delete($id);
-            
             if (!$success) {
                 return response()->json(['message' => 'Không tìm thấy phiếu đánh giá để xóa'], 404);
             }
-
             return response()->json(['message' => 'Xóa phiếu đánh giá thành công']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Có lỗi xảy ra khi xóa phiếu đánh giá'], 500);
