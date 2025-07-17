@@ -42,4 +42,8 @@ interface EvaluationRepositoryInterface
      * Lưu đánh giá với các chi tiết đánh giá và work descriptions
      */
     public function saveEvaluation(Request $request, int $id, $user = null): bool;
+
+    public function canUpdateWorkDescriptions($user, Evaluation $evaluation): bool;
+
+    public function updateWorkDescriptions(int $evaluationId, array $workDescriptions): void;
 } 

@@ -106,8 +106,6 @@ class AutoCreateMonthlyEvaluations extends Command
                 }
 
                 // Tạo work descriptions cho từng task
-                // TODO: Tạm thời comment để tập trung vào chức năng đánh giá theo từng cấp
-                /*
                 foreach ($tasks as $task) {
                     // Tính quality_weight và result_level
                     $result_level = 1;
@@ -138,7 +136,6 @@ class AutoCreateMonthlyEvaluations extends Command
                         'final_score' => ($result_level * $qualityWeight) / 5 * $task->weight,
                     ]);
                 }
-                */
             } else {
                 $this->info("Bỏ qua user {$user->name} - không có tasks cần đánh giá trong tháng {$month}/{$year}");
             }

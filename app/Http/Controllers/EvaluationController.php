@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\EvaluationService;
 use App\Http\Requests\StoreEvaluationRequest;
+use App\Http\Requests\UpdateWorkDescriptionsRequest;
 use Illuminate\Support\Facades\Auth;
 
 class EvaluationController extends Controller
@@ -127,5 +128,15 @@ class EvaluationController extends Controller
 
         // Gọi service xử lý như cũ
         return $this->evaluationService->saveEvaluation($request, (int) $id);
+    }
+
+    /**
+     * Cập nhật work descriptions cho evaluation
+     */
+    public function updateWorkDescriptions(UpdateWorkDescriptionsRequest $request, $id)
+    {
+        $user = $request->user();
+        $result = $this->evaluationService->updateWorkDescriptions($id, $request->input('work_descriptions', []), $user);
+        return $result;
     }
 } 
