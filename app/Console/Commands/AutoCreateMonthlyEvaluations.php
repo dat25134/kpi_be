@@ -32,9 +32,12 @@ class AutoCreateMonthlyEvaluations extends Command
      */
     public function handle()
     {
-        $now   = Carbon::parse('2025-07-25');
-        $month = $now->month;
-        $year  = $now->year;
+        // Lấy tháng/năm hiện tại
+        $today = now();
+        $month = $today->month;
+        $year  = $today->year;
+        // $now là ngày 25 của tháng/năm đang chạy
+        $now = Carbon::create($year, $month, 25, 0, 0, 0);
 
         $users = User::where('status', 'active')
             ->whereHas('roles', function ($q) {

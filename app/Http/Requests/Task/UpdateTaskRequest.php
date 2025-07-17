@@ -16,14 +16,14 @@ class UpdateTaskRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'content' => 'sometimes|required|string',
-            'startDate' => 'sometimes|required|date',
-            'deadline' => 'sometimes|required|date',
-            'category' => 'sometimes|required|exists:categories,id',
+            'content' => 'required|string',
+            'startDate' => 'required|date',
+            'deadline' => 'required|date',
+            'category' => 'required|exists:categories,id',
             'department' => 'nullable|exists:departments,id',
             'count' => 'required|integer|min:1|max:10',
-            'assigner' => 'sometimes|required|exists:users,id',
-            'mainHandler' => 'sometimes|required|exists:users,id',
+            'assigner' => 'required|exists:users,id',
+            'mainHandler' => 'required|exists:users,id',
             'status' => 'nullable|in:pending,in_progress,completed,cancelled',
             'assignees' => 'nullable|array',
             'assignees.*' => 'exists:users,id',

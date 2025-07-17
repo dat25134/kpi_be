@@ -58,6 +58,7 @@ class TaskResource extends JsonResource
                         'name' => $subtask->department->name,
                         'code' => $subtask->department->code,
                     ] : null,
+                    'assigner' => $subtask->assigner,
                     'startDate' => $subtask->start_date,
                     'deadline' => $subtask->due_date,
                     'mainHandler' => $subtask->mainAssignee,

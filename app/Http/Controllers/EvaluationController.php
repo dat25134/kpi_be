@@ -7,6 +7,7 @@ use App\Services\EvaluationService;
 use App\Http\Requests\StoreEvaluationRequest;
 use App\Http\Requests\UpdateWorkDescriptionsRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ManualCreateEvaluationRequest;
 
 class EvaluationController extends Controller
 {
@@ -137,6 +138,15 @@ class EvaluationController extends Controller
     {
         $user = $request->user();
         $result = $this->evaluationService->updateWorkDescriptions($id, $request->input('work_descriptions', []), $user);
+        return $result;
+    }
+
+    public function manualCreateEvaluation(ManualCreateEvaluationRequest $request)
+    {
+        $user = $request->user();
+        $month = $request->input('month');
+        $year = $request->input('year');
+        $result = $this->evaluationService->manualCreateEvaluation($user, $month, $year);
         return $result;
     }
 } 

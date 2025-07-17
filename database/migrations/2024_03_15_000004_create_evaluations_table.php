@@ -31,8 +31,8 @@ class CreateEvaluationsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            // Ensure one evaluation per user per month/year
-            $table->unique(['user_id', 'month', 'year']);
+            // Ensure one evaluation per user per month/year (kể cả soft delete)
+            $table->unique(['user_id', 'month', 'year', 'deleted_at']);
         });
     }
 
