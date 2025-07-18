@@ -149,4 +149,13 @@ class EvaluationController extends Controller
         $result = $this->evaluationService->manualCreateEvaluation($user, $month, $year);
         return $result;
     }
+
+    /**
+     * Lấy bảng mô tả công việc cho user hiện tại theo tháng/năm
+     */
+    public function getCurrentUserWorkDescriptions(Request $request)
+    {
+        $user = $request->user();
+        return $this->evaluationService->getCurrentUserWorkDescriptions($user);
+    }
 } 

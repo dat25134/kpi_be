@@ -362,4 +362,45 @@ class EvaluationService
             'level2_approver_role' => $level2ApproverRole,
         ];
     }
+
+    /**
+     * Lấy bảng mô tả công việc cho user hiện tại theo tháng/năm
+     */
+    public function getCurrentUserWorkDescriptions($user)
+    {
+        $now = now();
+        $month = $now->month;
+        $year = $now->year;
+
+        $evaluation = \App\Models\Evaluation::where('user_id', $user->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+        if (!$evaluation) {
+            return response()->json([
+                'user_id' => $user->id,
+                'month' => $month,
+                'year' => $year,
+                'work_descriptions' => []
+            ]);
+        }
+        $workDescriptions = \App\Models\WorkDescription::where('evaluation_id', $evaluation->id)->get();
+        $data = [
+            'user_id' => $user->id,
+            'month' => $month,
+            'year' => $year,
+            'work_descriptions' => $workDescriptions->map(function($w) {
+                return [
+                    'id' => $w->id,
+                    'task_title' => $w->task_title,
+                    'quality_weight' => $w->quality_weight,
+                    'result_level' => $w->result_level,
+                    'final_score' => $w->final_score,
+                    'task_weight' => $w->task_weight,
+                    // ... các trường khác nếu cần ...
+                ];
+            })->toArray()
+        ];
+        return response()->json($data);
+    }
 } 

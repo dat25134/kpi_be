@@ -36,13 +36,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Task (project.* permissions)
     Route::prefix('tasks')->group(function () {
+        Route::middleware('permission:project.view_all|project.view_related')->get('/current-user-work-descriptions', [EvaluationController::class, 'getCurrentUserWorkDescriptions']);
         Route::middleware('permission:project.view_all|project.view_related')->get('/', [TaskController::class, 'index']);
         Route::middleware('permission:project.create')->post('/', [TaskController::class, 'store']);
         Route::middleware('permission:project.edit')->post('/{id}', [TaskController::class, 'update']);
         // Route::delete('/{id}', [TaskController::class, 'destroy']);
         Route::middleware('permission:project.update_progress')->post('/{taskId}/progress', [TaskProgressController::class, 'store']);
         Route::middleware('permission:project.edit')->delete('/{taskId}/files/{id}', [TaskController::class, 'deleteFile']);
-        // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);
+        // Route::delete('/{taskId}/progress/{progressId}', [TaskProgressController::class, 'destroy']);       
     });
 
     // Activity log (report.view_log)
