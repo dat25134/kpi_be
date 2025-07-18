@@ -310,4 +310,50 @@ class ReportController extends Controller
         }
         return response()->json($result);
     }
+
+    /**
+     * Top Performers (top 5 nhân viên có KPI/score cao nhất)
+     */
+    public function topPerformers(Request $request)
+    {
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json([
+                'message' => 'Tham số departmentId không hợp lệ.'
+            ], 422);
+        }
+
+        // Lấy evaluation mới nhất của từng user (theo tháng/năm lớn nhất)
+        $evaluationQuery = \App\Models\Evaluation::query();
+        if ($departmentId) {
+            $departmentName = \App\Models\Department::find($departmentId)->name;
+            $evaluationQuery->where('department', $departmentName);
+        }
+        $evaluationQuery->whereNotNull('total_score');
+        $evaluations = $evaluationQuery->orderByDesc('year')->orderByDesc('month')->get();
+
+        $latestEvaluations = $evaluations
+            ->groupBy('user_id')
+            ->map(function($group) {
+                return $group->first();
+            })
+            ->sortByDesc('total_score')
+            ->take(5);
+
+        $result = [];
+        foreach ($latestEvaluations as $eva) {
+            $user = \App\Models\User::find($eva->user_id);
+            $result[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar ?? null,
+                'position' => optional($user->roles->first())->display_name ?? optional($user->roles->first())->name ?? null,
+                'kpi' => round($eva->total_score, 2),
+                'score' => round($eva->total_score, 2)
+            ];
+        }
+        return response()->json($result);
+    }
 } 
