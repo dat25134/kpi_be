@@ -118,5 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:report.view_dashboard')->get('/top-performers', [ReportController::class, 'topPerformers']);
         Route::middleware('permission:report.view_dashboard')->get('/alerts-notifications', [ReportController::class, 'alertsNotifications']);
         Route::middleware('permission:report.view_dashboard')->get('/department-distribution', [ReportController::class, 'departmentDistribution']);
+        Route::middleware('permission:report.view_dashboard')->get('/monthly-performance', [ReportController::class, 'monthlyPerformance']);
+        Route::middleware('permission:report.view_dashboard')->get('/recent-activities', [ReportController::class, 'recentActivities']);
     });
 });

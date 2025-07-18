@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Department;
-use App\Models\Role;
-use App\Models\Task;
+use Spatie\Activitylog\Models\Activity;
 
 class ReportController extends Controller
 {
@@ -471,6 +468,162 @@ class ReportController extends Controller
                 'id' => $dept->id,
                 'name' => $dept->code,
                 'employees' => $employees
+            ];
+        })->values();
+
+        return response()->json($result);
+    }
+
+    /**
+     * Hiệu suất tháng (Monthly Performance)
+     */
+    public function monthlyPerformance(Request $request)
+    {
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+        $time = $request->query('time', 'month');
+        $now = now();
+
+        // Validate time
+        $validTimes = ['week', 'month', 'quarter', 'year'];
+        if (!in_array($time, $validTimes)) {
+            return response()->json(['message' => 'Tham số time không hợp lệ.'], 422);
+        }
+
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json(['message' => 'Tham số departmentId không hợp lệ.'], 422);
+        }
+
+        // Xác định khoảng thời gian
+        if ($time === 'week') {
+            $start = $now->copy()->startOfWeek();
+            $end = $now->copy()->endOfWeek();
+        } elseif ($time === 'month') {
+            $start = $now->copy()->startOfMonth();
+            $end = $now->copy()->endOfMonth();
+        } elseif ($time === 'quarter') {
+            $start = $now->copy()->startOfQuarter();
+            $end = $now->copy()->endOfQuarter();
+        } else { // year
+            $start = $now->copy()->startOfYear();
+            $end = $now->copy()->endOfYear();
+        }
+
+        // Query task theo khoảng thời gian và phòng ban nếu có
+        $taskQuery = \App\Models\Task::whereBetween('created_at', [$start, $end]);
+        if ($departmentId) {
+            $taskQuery->where('department_id', $departmentId);
+        }
+        $tasks = $taskQuery->get();
+        $totalTasks = $tasks->count();
+
+        // Tính onTimeRate: % task completed đúng hạn
+        $onTime = $tasks->where('status', 'completed')->filter(function($task) {
+            return $task->completed_at && $task->due_date && $task->completed_at <= $task->due_date;
+        })->count();
+        $onTimeRate = $totalTasks > 0 ? round($onTime / $totalTasks * 100) : 0;
+
+        // Tính averageQuality: trung bình quality_weight (thang 1-5) quy đổi về %
+        $averageQuality = $totalTasks > 0 ? round($tasks->avg('quality_weight') / 5 * 100) : 0;
+
+        // Tính averageComplexity: trung bình weight (thang 1-5) quy đổi về %
+        $averageComplexity = $totalTasks > 0 ? round($tasks->avg('weight') / 5 * 100) : 0;
+
+        return response()->json([
+            'onTimeRate' => $onTimeRate,
+            'averageQuality' => $averageQuality,
+            'averageComplexity' => $averageComplexity
+        ]);
+    }
+
+    /**
+     * Hoạt động gần đây (Recent Activities)
+     */
+    public function recentActivities(Request $request)
+    {
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+        $time = $request->query('timeFilter', 'month');
+        $now = now();
+
+        // Validate time
+        $validTimes = ['week', 'month', 'quarter', 'year'];
+        if (!in_array($time, $validTimes)) {
+            return response()->json(['message' => 'Tham số timeFilter không hợp lệ.'], 422);
+        }
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json(['message' => 'Tham số departmentId không hợp lệ.'], 422);
+        }
+
+        // Xác định khoảng thời gian
+        if ($time === 'week') {
+            $start = $now->copy()->startOfWeek();
+            $end = $now->copy()->endOfWeek();
+        } elseif ($time === 'month') {
+            $start = $now->copy()->startOfMonth();
+            $end = $now->copy()->endOfMonth();
+        } elseif ($time === 'quarter') {
+            $start = $now->copy()->startOfQuarter();
+            $end = $now->copy()->endOfQuarter();
+        } else { // year
+            $start = $now->copy()->startOfYear();
+            $end = $now->copy()->endOfYear();
+        }
+
+        $activityQuery = Activity::whereBetween('created_at', [$start, $end]);
+        if ($departmentId) {
+            $activityQuery->whereHasMorph(
+                'causer',
+                [\App\Models\User::class],
+                function ($q) use ($departmentId) {
+                    $q->where('department_id', $departmentId);
+                }
+            );
+        }
+        $activities = $activityQuery->orderByDesc('created_at')->limit(5)->get();
+
+        $typeColor = [
+            'created' => 'green',
+            'updated' => 'blue',
+            'deleted' => 'red',
+            'default' => 'purple',
+        ];
+
+        $result = $activities->map(function($act) use ($typeColor) {
+            // Lấy tên người thực hiện (causer)
+            if ($act->causer_type === \App\Models\User::class && $act->causer_id) {
+                $user = \App\Models\User::find($act->causer_id);
+                $causerName = $user ? $user->name : 'Hệ thống';
+            } else {
+                $causerName = 'Hệ thống';
+            }
+
+            // Lấy tên đối tượng (subject)
+            $subjectName = null;
+            if ($act->subject_type && $act->subject_id) {
+                $subjectModel = app($act->subject_type);
+                $subject = $subjectModel->find($act->subject_id);
+                $subjectName = $subject->name ?? $subject->content ?? $subject->title ?? null;
+            }
+
+            // Lấy mô tả hành động
+            $action = $act->description;
+
+            // Build content
+            if ($causerName && $subjectName) {
+                $content = "{$causerName} đã {$action} \"{$subjectName}\"";
+            } elseif ($causerName) {
+                $content = "{$causerName} đã {$action}";
+            } else {
+                $content = $action;
+            }
+
+            $type = $act->event ?? 'default';
+            return [
+                'id' => $act->id,
+                'type' => $type,
+                'content' => $content,
+                'color' => $typeColor[$type] ?? $typeColor['default']
             ];
         })->values();
 
