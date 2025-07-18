@@ -256,4 +256,58 @@ class ReportController extends Controller
         }
         return response()->json($result);
     }
+
+    /**
+     * Xu hướng KPI theo tháng trong năm
+     */
+    public function kpiTrends(Request $request)
+    {
+        $year = $request->query('year', now()->year);
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+
+        // Validate year
+        if (!is_numeric($year) || $year < 2000 || $year > 2100) {
+            return response()->json([
+                'message' => 'Tham số year không hợp lệ.'
+            ], 422);
+        }
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json([
+                'message' => 'Tham số departmentId không hợp lệ.'
+            ], 422);
+        }
+
+        // Lấy target mặc định (ví dụ: 80, có thể lấy từ config hoặc DB nếu có)
+        $defaultTarget = 100;
+        // Nếu có bảng lưu target KPI theo tháng/phòng ban, có thể lấy động ở đây
+        $targets = array_fill(1, 12, $defaultTarget); // [1 => 80, 2 => 80, ...]
+
+        // Nếu có bảng lưu target KPI riêng từng tháng, từng phòng ban, có thể join ở đây
+        // ...
+
+        // Lấy achieved (trung bình cộng total_score) theo từng tháng
+        $achievedByMonth = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $evaQuery = \App\Models\Evaluation::where('month', $m)->where('year', $year);
+            if ($departmentId) {
+                $evaQuery->where('department', function($q) use ($departmentId) {
+                    $q->select('name')->from('departments')->where('id', $departmentId)->limit(1);
+                });
+            }
+            $achievedByMonth[$m] = round($evaQuery->avg('total_score') ?? 0, 2);
+        }
+
+        // Chuẩn bị dữ liệu trả về đủ 12 tháng
+        $result = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $monthStr = 'T' . $m;
+            $result[] = [
+                'month' => $monthStr,
+                'target' => $targets[$m] ?? 0,
+                'achieved' => $achievedByMonth[$m] ?? 0
+            ];
+        }
+        return response()->json($result);
+    }
 } 

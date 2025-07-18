@@ -114,5 +114,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:report.view_dashboard')->get('/department-stats', [ReportController::class, 'departmentStats']);
         Route::middleware('permission:report.view_dashboard')->get('/position-stats', [ReportController::class, 'positionStats']);
         Route::middleware('permission:report.view_dashboard')->get('/task-progress', [ReportController::class, 'taskProgress']);
+        Route::middleware('permission:report.view_dashboard')->get('/kpi-trends', [ReportController::class, 'kpiTrends']);
     });
 });
