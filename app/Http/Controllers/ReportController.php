@@ -442,4 +442,38 @@ class ReportController extends Controller
             'overdueTaskDetails' => $overdueTaskDetails
         ]);
     }
+
+    /**
+     * Phân bố theo phòng ban (Pie Chart)
+     */
+    public function departmentDistribution(Request $request)
+    {
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json([
+                'message' => 'Tham số departmentId không hợp lệ.'
+            ], 422);
+        }
+
+        if ($departmentId) {
+            // Lấy đúng 1 phòng ban theo id
+            $departments = \App\Models\Department::where('id', $departmentId)->get();
+        } else {
+            // Lấy tất cả phòng ban
+            $departments = \App\Models\Department::all();
+        }
+
+        $result = $departments->map(function($dept) {
+            $employees = \App\Models\User::where('department_id', $dept->id)->count();
+            return [
+                'id' => $dept->id,
+                'name' => $dept->code,
+                'employees' => $employees
+            ];
+        })->values();
+
+        return response()->json($result);
+    }
 } 
