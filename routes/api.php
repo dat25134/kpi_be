@@ -110,8 +110,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Report (report.* permissions)
     Route::prefix('report')->group(function () {
-        // Route::middleware('permission:report.view_log')->get('/view_log', [ReportController::class, 'viewLog']);
-        // Route::middleware('permission:report.view_kpi')->get('/view_kpi', [ReportController::class, 'viewKpi']);
-        // Route::middleware('permission:report.export')->get('/export', [ReportController::class, 'export']);
+        Route::middleware('permission:report.view_dashboard')->get('/overview', [ReportController::class, 'overview']);
+        Route::middleware('permission:report.view_dashboard')->get('/department-stats', [ReportController::class, 'departmentStats']);
+        Route::middleware('permission:report.view_dashboard')->get('/position-stats', [ReportController::class, 'positionStats']);
+        Route::middleware('permission:report.view_dashboard')->get('/task-progress', [ReportController::class, 'taskProgress']);
     });
 });
