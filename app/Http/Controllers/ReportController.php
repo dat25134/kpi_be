@@ -356,4 +356,90 @@ class ReportController extends Controller
         }
         return response()->json($result);
     }
+
+    /**
+     * Alerts & Notifications cho dashboard/report
+     */
+    public function alertsNotifications(Request $request)
+    {
+        $departmentId = $request->query('departmentId') == 'all' ? null : $request->query('departmentId');
+        $now = now();
+        $startOfWeek = $now->copy()->startOfWeek();
+        $endOfWeek = $now->copy()->endOfWeek();
+
+        // Validate departmentId nếu có
+        if ($departmentId !== null && (!is_numeric($departmentId) || !\App\Models\Department::where('id', $departmentId)->exists())) {
+            return response()->json([
+                'message' => 'Tham số departmentId không hợp lệ.'
+            ], 422);
+        }
+
+        // Overdue tasks
+        $overdueTasksQuery = \App\Models\Task::whereIn('status', ['pending', 'in_progress'])
+            ->where('due_date', '<', $now);
+        // Upcoming tasks (đến hạn trong tuần này)
+        $upcomingTasksQuery = \App\Models\Task::whereIn('status', ['pending', 'in_progress'])
+            ->whereBetween('due_date', [$now, $endOfWeek]);
+        if ($departmentId) {
+            $overdueTasksQuery->where('department_id', $departmentId);
+            $upcomingTasksQuery->where('department_id', $departmentId);
+        }
+        $overdueTasks = $overdueTasksQuery->count();
+        $upcomingTasks = $upcomingTasksQuery->count();
+
+        // New employees chưa được phân công việc (giả sử chưa có task nào qua các quan hệ)
+        $newEmployeesQuery = \App\Models\User::whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year);
+        if ($departmentId) {
+            $newEmployeesQuery->where('department_id', $departmentId);
+        }
+        $newEmployees = $newEmployeesQuery
+            ->whereDoesntHave('assignedTasks')
+            ->whereDoesntHave('assignedByTasks')
+            ->whereDoesntHave('collaboratedTasks')
+            ->count();
+
+        // Achieved targets: phòng ban đạt/vượt mục tiêu tháng (giả sử target mặc định là 100, lấy trung bình total_score của evaluations trong tháng)
+        $achievedTargets = [];
+        $departments = $departmentId
+            ? \App\Models\Department::where('id', $departmentId)->get()
+            : \App\Models\Department::all();
+        foreach ($departments as $dept) {
+            $avgScore = \App\Models\Evaluation::where('department', $dept->name)
+                ->where('month', $now->month)
+                ->where('year', $now->year)
+                ->avg('total_score');
+            $target = 100; // target mặc định
+            if ($avgScore !== null && $target > 0 && $avgScore >= $target) {
+                $percent = round($avgScore / $target * 100);
+                $achievedTargets[] = [
+                    'department' => $dept->name,
+                    'percent' => $percent
+                ];
+            }
+        }
+
+        // Overdue task details
+        $overdueTaskDetails = $overdueTasksQuery->get()->map(function($task) use ($now) {
+            $department = optional($task->department)->name ?? null;
+            $assignee = optional($task->mainAssignee)->name ?? null;
+            $overdueDays = $now->diffInDays(optional($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $now, false);
+            $overdueDays = abs($overdueDays);
+            return [
+                'id' => $task->id,
+                'name' => $task->content,
+                'department' => $department,
+                'overdueDays' => round($overdueDays),
+                'assignee' => $assignee
+            ];
+        })->values();
+
+        return response()->json([
+            'overdueTasks' => $overdueTasks,
+            'upcomingTasks' => $upcomingTasks,
+            'newEmployees' => $newEmployees,
+            'achievedTargets' => $achievedTargets,
+            'overdueTaskDetails' => $overdueTaskDetails
+        ]);
+    }
 } 
