@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/info', [AuthController::class, 'user']);
     Route::get('/user/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('user/change-password', [AuthController::class, 'changePassword']);
 
     // Task (project.* permissions)
     Route::prefix('tasks')->group(function () {

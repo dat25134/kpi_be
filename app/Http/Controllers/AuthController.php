@@ -6,6 +6,7 @@ use App\Http\Resources\UserInfoResource;
 use App\Http\Resources\UserProfileResource;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,5 +70,30 @@ class AuthController extends Controller
     public function profile(Request $request)
     {
         return response()->json(new UserProfileResource($request->user()));
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = $request->user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mật khẩu hiện tại không đúng.'
+            ], 422);
+        }
+        if ($request->current_password === $request->new_password) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+            ], 422);
+        }
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+        // Đăng xuất user sau khi đổi mật khẩu
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Đổi mật khẩu thành công! Bạn đã được đăng xuất, vui lòng đăng nhập lại.'
+        ]);
     }
 } 
