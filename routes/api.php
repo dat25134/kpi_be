@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Task (project.* permissions)
     Route::prefix('tasks')->group(function () {
+        Route::middleware('permission:project.export_report')->post('/export-word', [TaskController::class, 'exportWord']);
         Route::middleware('permission:project.view_all|project.view_related')->get('/current-user-work-descriptions', [EvaluationController::class, 'getCurrentUserWorkDescriptions']);
         Route::middleware('permission:project.view_all|project.view_related')->get('/', [TaskController::class, 'index']);
         Route::middleware('permission:project.create')->post('/', [TaskController::class, 'store']);
