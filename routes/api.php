@@ -74,11 +74,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Employee (hr.* permissions)
     Route::prefix('employees')->group(function () {
         Route::middleware('permission:hr.view')->get('/', [EmployeeController::class, 'employees']);
+        Route::middleware('permission:hr.create')->post('/import', [EmployeeController::class, 'importEmployees']);
         Route::middleware('permission:hr.view')->get('/summary', [EmployeeController::class, 'summary']);
         Route::middleware('permission:hr.create')->post('/', [EmployeeController::class, 'store']);
         Route::middleware('permission:hr.view')->get('/{id}', [EmployeeController::class, 'details']);
         Route::middleware('permission:hr.edit')->put('/{id}', [EmployeeController::class, 'update']);
         Route::middleware('permission:hr.delete')->delete('/{id}', [EmployeeController::class, 'destroy']);
+        
     });
 
     // Role management (system.grant_permission)

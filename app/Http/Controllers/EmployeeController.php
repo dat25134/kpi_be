@@ -14,6 +14,11 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Arr;
+use App\Services\PasswordGeneratorService;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -150,6 +155,131 @@ class EmployeeController extends Controller
             'success' => true,
             'message' => 'Lấy danh sách trưởng phòng thành công',
             'data' => EmployeeResource::collection($truongphong),
+        ]);
+    }
+
+    /**
+     * Import nhân viên từ file CSV/Excel
+     */
+    public function importEmployees(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xls,xlsx',
+        ], [
+            'file.required' => 'Vui lòng chọn file.',
+            'file.file' => 'File không hợp lệ.',
+            'file.mimes' => 'Chỉ hỗ trợ file CSV, XLS, XLSX.',
+        ]);
+
+        $file = $request->file('file');
+        $rows = [];
+        try {
+            $rows = Excel::toArray([], $file)[0]; // Lấy sheet đầu tiên
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể đọc file: ' . $e->getMessage(),
+            ], 422);
+        }
+        if (empty($rows) || count($rows) < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File không có dữ liệu hoặc thiếu header.',
+            ], 422);
+        }
+        $header = array_map(fn($h) => trim($h), $rows[0]);
+        $dataRows = array_slice($rows, 1);
+        $errors = [];
+        $imported = 0;
+        foreach ($dataRows as $index => $row) {
+            $rowData = array_combine($header, $row + array_fill(0, count($header), null));
+            $line = $index + 2; // Dòng thực tế trong file (tính cả header)
+            // Validate các trường bắt buộc
+            $name = trim($rowData['name'] ?? '');
+            $email = trim($rowData['email'] ?? '');
+            $cccd = trim($rowData['cccd'] ?? '');
+            $roleName = trim($rowData['roleName'] ?? '');
+            if (!$name) {
+                $errors[] = [ 'row' => $line, 'field' => 'name', 'error' => 'Thiếu tên nhân viên' ];
+                continue;
+            }
+            if (!$email) {
+                $errors[] = [ 'row' => $line, 'field' => 'email', 'error' => 'Thiếu email' ];
+                continue;
+            }
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = [ 'row' => $line, 'field' => 'email', 'error' => 'Email không hợp lệ' ];
+                continue;
+            }
+            if (!$cccd || strlen($cccd) < 4) {
+                $errors[] = [ 'row' => $line, 'field' => 'cccd', 'error' => 'Thiếu hoặc không đủ 4 số cuối CCCD' ];
+                continue;
+            }
+            if (!$roleName) {
+                $errors[] = [ 'row' => $line, 'field' => 'roleName', 'error' => 'Thiếu vai trò' ];
+                continue;
+            }
+            // Validate roleName tồn tại
+            if (!\Spatie\Permission\Models\Role::where('name', $roleName)->exists()) {
+                $errors[] = [ 'row' => $line, 'field' => 'roleName', 'error' => 'Vai trò không tồn tại trong hệ thống' ];
+                continue;
+            }
+            // Kiểm tra trùng email, cccd trong DB
+            if (\App\Models\User::where('email', $email)->exists()) {
+                $errors[] = [ 'row' => $line, 'field' => 'email', 'error' => 'Email đã tồn tại trong hệ thống' ];
+                continue;
+            }
+            if ($cccd && \App\Models\User::where('cccd', $cccd)->exists()) {
+                $errors[] = [ 'row' => $line, 'field' => 'cccd', 'error' => 'CCCD đã tồn tại trong hệ thống' ];
+                continue;
+            }
+            // Sinh password
+            $password = PasswordGeneratorService::generatePasswordFromNameAndCCCD($name, $cccd);
+
+            if (!$password) {
+                $errors[] = [ 'row' => $line, 'field' => 'password', 'error' => 'Không thể sinh mật khẩu từ họ và CCCD' ];
+                continue;
+            }
+            // Chuẩn bị dữ liệu cho createEmployee
+            $userData = [
+                'name' => $name,
+                'email' => $email,
+                'phone' => trim($rowData['phone'] ?? ''),
+                'cccd' => $cccd,
+                'departmentId' => $rowData['departmentId'] ?? null,
+                'roleName' => $roleName,
+                'joinDate' => $rowData['joinDate'] ?? null,
+                'password' => $password, // Truyền password custom
+            ];
+            $userInfoData = [
+                'salary' => $rowData['salary'] ?? null,
+                'address' => $rowData['address'] ?? null,
+                'birthDate' => $rowData['birthDate'] ?? null,
+                'gender' => $rowData['gender'] ?? null,
+                'education' => $rowData['education'] ?? null,
+                'experience' => $rowData['experience'] ?? null,
+                'skills' => isset($rowData['skills']) ? array_map('trim', explode(',', $rowData['skills'])) : [],
+            ];
+            try {
+                // Gọi createEmployee, nhưng cần sửa lại để nhận password custom
+                $this->userRepository->createEmployee($userData, $userInfoData, true);
+                $imported++;
+            } catch (\Exception $e) {
+                $errors[] = [ 'row' => $line, 'field' => 'system', 'error' => 'Lỗi hệ thống: ' . $e->getMessage() ];
+            }
+        }
+        if ($errors) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi khi import file',
+                'imported' => $imported,
+                'errors' => $errors
+            ], 422);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Import thành công',
+            'imported' => $imported
         ]);
     }
 } 

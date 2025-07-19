@@ -106,4 +106,48 @@ class PasswordGeneratorService
         
         return $password;
     }
+
+    /**
+     * Sinh password theo quy tắc: Họ viết liền không dấu + 4 số cuối CCCD
+     * @param string $name
+     * @param string $cccd
+     * @return string|null
+     */
+    public static function generatePasswordFromNameAndCCCD(string $name, string $cccd): ?string
+    {
+        if (empty($name) || empty($cccd) || strlen($cccd) < 4) {
+            return null;
+        }
+        // Lấy tên (từ cuối cùng trong tên đầy đủ)
+        $parts = preg_split('/\s+/', trim($name));
+        $ten = end($parts);
+        if (!$ten) return null;
+        // Loại bỏ dấu tiếng Việt
+        $ten_khong_dau = self::removeVietnameseAccents($ten);
+        // Lấy 4 số cuối CCCD
+        $cccd4 = substr($cccd, -4);
+        return strtolower($ten_khong_dau . $cccd4);
+    }
+
+    /**
+     * Loại bỏ dấu tiếng Việt khỏi chuỗi
+     */
+    public static function removeVietnameseAccents($str)
+    {
+        $accents = [
+            'a'=>'áàảãạăắằẳẵặâấầẩẫậ',
+            'A'=>'ÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬ',
+            'd'=>'đ', 'D'=>'Đ',
+            'e'=>'éèẻẽẹêếềểễệ', 'E'=>'ÉÈẺẼẸÊẾỀỂỄỆ',
+            'i'=>'íìỉĩị', 'I'=>'ÍÌỈĨỊ',
+            'o'=>'óòỏõọôốồổỗộơớờởỡợ',
+            'O'=>'ÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢ',
+            'u'=>'úùủũụưứừửữự', 'U'=>'ÚÙỦŨỤƯỨỪỬỮỰ',
+            'y'=>'ýỳỷỹỵ', 'Y'=>'ÝỲỶỸỴ'
+        ];
+        foreach ($accents as $nonAccent => $accentGroup) {
+            $str = preg_replace("/[$accentGroup]/u", $nonAccent, $str);
+        }
+        return $str;
+    }
 } 

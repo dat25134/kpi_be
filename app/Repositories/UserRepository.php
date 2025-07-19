@@ -99,13 +99,16 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         ];
     }
 
-    public function createEmployee(array $userData, array $userInfoData)
+    public function createEmployee(array $userData, array $userInfoData, $customPassword = false)
     {
         DB::beginTransaction();
         try {
-            // Tạo mật khẩu ngẫu nhiên
-            $plainPassword = \App\Services\PasswordGeneratorService::generateSecurePassword();
-            
+            // Tạo mật khẩu
+            if ($customPassword && !empty($userData['password'])) {
+                $plainPassword = $userData['password'];
+            } else {
+                $plainPassword = \App\Services\PasswordGeneratorService::generateSecurePassword();
+            }
             // Tạo User
             $user = $this->model->create([
                 'name' => $userData['name'],
@@ -113,13 +116,12 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'phone' => $userData['phone'] ?? null,
                 'department_id' => $userData['departmentId'],
                 'cccd' => $userData['cccd'] ?? null,
-                'password' => Hash::make($plainPassword), // Mật khẩu ngẫu nhiên
-                'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
+                'password' => Hash::make($plainPassword),
+                'employee_id' => 'EMP' . strtoupper(Str::random(6)),
                 'status' => 'active',
                 'join_date' => isset($userData['joinDate']) ? Carbon::createFromFormat('Y-m-d', $userData['joinDate'])->format('Y-m-d') : null,
             ]);
             $user->syncRoles([$userData['roleName']]);
-
             // Tạo UserInfo
             UserInfo::create([
                 'user_id' => $user->id,
@@ -131,19 +133,17 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'experience' => $userInfoData['experience'] ?? null,
                 'skills' => $userInfoData['skills'] ?? [],
             ]);
-
             DB::commit();
-
-            // Dispatch job gửi email chứa mật khẩu trong background
-            SendEmployeePasswordEmailJob::dispatch(
-                $user->name,
-                $user->email,
-                $plainPassword,
-                $user->employee_id
-            );
-
+            // Nếu không phải import (tức là tạo thủ công), gửi email
+            if (!$customPassword) {
+                SendEmployeePasswordEmailJob::dispatch(
+                    $user->name,
+                    $user->email,
+                    $plainPassword,
+                    $user->employee_id
+                );
+            }
             return $user->load(['info', 'department', 'projects']);
-
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
