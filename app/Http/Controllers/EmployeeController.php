@@ -83,7 +83,7 @@ class EmployeeController extends Controller
         if ($result) {
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo nhân viên thành công',
+                'message' => 'Tạo nhân viên thành công. Mật khẩu đăng nhập đã được gửi đến email ' . $result->email,
                 'data' => new EmployeeResource($result),
             ], 201);
         } else {

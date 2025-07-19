@@ -9,8 +9,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Mail\EmployeePasswordMail;
+use App\Jobs\SendEmployeePasswordEmailJob;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
@@ -99,6 +103,9 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            // Tạo mật khẩu ngẫu nhiên
+            $plainPassword = \App\Services\PasswordGeneratorService::generateSecurePassword();
+            
             // Tạo User
             $user = $this->model->create([
                 'name' => $userData['name'],
@@ -106,7 +113,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'phone' => $userData['phone'] ?? null,
                 'department_id' => $userData['departmentId'],
                 'cccd' => $userData['cccd'] ?? null,
-                'password' => Hash::make('password'), // Mật khẩu mặc định
+                'password' => Hash::make($plainPassword), // Mật khẩu ngẫu nhiên
                 'employee_id' => 'EMP' . strtoupper(Str::random(6)), // Mã nhân viên tự động
                 'status' => 'active',
                 'join_date' => isset($userData['joinDate']) ? Carbon::createFromFormat('Y-m-d', $userData['joinDate'])->format('Y-m-d') : null,
@@ -126,6 +133,14 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             ]);
 
             DB::commit();
+
+            // Dispatch job gửi email chứa mật khẩu trong background
+            SendEmployeePasswordEmailJob::dispatch(
+                $user->name,
+                $user->email,
+                $plainPassword,
+                $user->employee_id
+            );
 
             return $user->load(['info', 'department', 'projects']);
 
