@@ -8,6 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TaskRepository extends BaseRepository implements TaskRepositoryInterface
 {
@@ -112,9 +113,25 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
                     $task->addMedia($file)->toMediaCollection('task_files');
                 }
             }
+            // Gửi notification cho các user liên quan
+            $users = collect([$task->assigner, $task->mainAssignee])
+                ->merge($task->collaborators)
+                ->unique('id')
+                ->filter();
+            foreach ($users as $user) {
+                if ($user) {
+                    $user->notify(new \App\Notifications\TaskRelatedNotification([
+                        'id' => $task->id,
+                        'title' => 'Bạn có task mới',
+                        'content' => $task->content,
+                        'url' => env('APP_URL_FE') . '/dashboard/',
+                    ]));
+                }
+            }
             DB::commit();
             return $task;
         } catch (\Exception $e) {
+            Log::error($e);
             DB::rollBack();
             return false;
         }

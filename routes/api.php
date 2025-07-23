@@ -125,4 +125,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:report.view_dashboard')->get('/monthly-performance', [ReportController::class, 'monthlyPerformance']);
         Route::middleware('permission:report.view_dashboard')->get('/recent-activities', [ReportController::class, 'recentActivities']);
     });
+
+    // Notification endpoints
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/notifications', function (\Illuminate\Http\Request $request) {
+            return $request->user()->notifications()->latest()->get();
+        });
+        Route::post('/notifications/{id}/mark-read', function (\Illuminate\Http\Request $request, $id) {
+            $notification = $request->user()->notifications()->findOrFail($id);
+            $notification->markAsRead();
+            return response()->noContent();
+        });
+        Route::post('/notifications/mark-all-read', function (\Illuminate\Http\Request $request) {
+            $request->user()->unreadNotifications->markAsRead();
+            return response()->noContent();
+        });
+    });
 });
