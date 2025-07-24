@@ -120,12 +120,16 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
                 ->filter();
             foreach ($users as $user) {
                 if ($user) {
-                    $user->notify(new \App\Notifications\TaskRelatedNotification([
+                    $notificationData = [
                         'id' => $task->id,
                         'title' => 'Bạn có task mới',
                         'content' => $task->content,
                         'url' => env('APP_URL_FE') . '/dashboard/',
-                    ]));
+                        'user_id' => $user->id,
+                    ];
+                    $user->notify(new \App\Notifications\TaskRelatedNotification($notificationData));
+                    // Broadcast event public channel
+                    event(new \App\Events\TaskNotificationBroadcasted($user->id, $notificationData));
                 }
             }
             DB::commit();

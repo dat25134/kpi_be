@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Broadcasting\Channel;
 
 class TaskRelatedNotification extends Notification implements ShouldQueue
 {
@@ -20,7 +21,7 @@ class TaskRelatedNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database']; // KHÔNG có 'broadcast' để không broadcast mặc định
     }
 
     public function toArray($notifiable)
@@ -43,5 +44,11 @@ class TaskRelatedNotification extends Notification implements ShouldQueue
     public function broadcastType()
     {
         return 'notification';
+    }
+
+    public function broadcastOn()
+    {
+        // Dùng public channel, cần truyền user_id vào $data khi notify
+        return [new Channel('user.' . $this->data['user_id'])];
     }
 } 

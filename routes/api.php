@@ -129,7 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notification endpoints
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/notifications', function (\Illuminate\Http\Request $request) {
-            return $request->user()->notifications()->latest()->get();
+            return $request->user()->notifications()->latest()->limit(20)->get();
         });
         Route::post('/notifications/{id}/mark-read', function (\Illuminate\Http\Request $request, $id) {
             $notification = $request->user()->notifications()->findOrFail($id);
