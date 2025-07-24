@@ -282,4 +282,22 @@ class EmployeeController extends Controller
             'imported' => $imported
         ]);
     }
+
+    /**
+     * Reset mật khẩu cho nhân viên, gửi email mật khẩu mới
+     * POST /api/employees/{id}/reset-password
+     */
+    public function resetPassword($id)
+    {
+        try {
+            $user = $this->userRepository->resetEmployeePassword($id);
+            return response()->json([
+                'message' => 'Đã gửi email đặt lại mật khẩu cho nhân viên.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Không thể reset mật khẩu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

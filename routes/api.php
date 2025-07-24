@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:hr.view')->get('/{id}', [EmployeeController::class, 'details']);
         Route::middleware('permission:hr.edit')->put('/{id}', [EmployeeController::class, 'update']);
         Route::middleware('permission:hr.delete')->delete('/{id}', [EmployeeController::class, 'destroy']);
+        Route::middleware('permission:hr.edit')->post('/{id}/reset-password', [EmployeeController::class, 'resetPassword']);
         
     });
 

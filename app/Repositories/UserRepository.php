@@ -229,4 +229,26 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return $this->model->with(['info', 'department', 'projects'])->findOrFail($id);
     }
+
+    /**
+     * Reset mật khẩu cho nhân viên, gửi email mật khẩu mới
+     */
+    public function resetEmployeePassword(int $id)
+    {
+        $user = $this->findOrFail($id);
+        if ($user->hasRole('admin')) {
+            throw new \Exception('Không thể reset mật khẩu cho tài khoản quản trị viên.');
+        }
+        $plainPassword = \App\Services\PasswordGeneratorService::generateSecurePassword();
+        $user->password = \Illuminate\Support\Facades\Hash::make($plainPassword);
+        $user->save();
+        \App\Jobs\SendEmployeePasswordEmailJob::dispatch(
+            $user->name,
+            $user->email,
+            $plainPassword,
+            $user->employee_id,
+            true
+        );
+        return $user;
+    }
 }
