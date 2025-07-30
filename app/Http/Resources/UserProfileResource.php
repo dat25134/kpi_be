@@ -44,6 +44,7 @@ class UserProfileResource extends JsonResource
                 'color' => optional($this->roles->first())->color,
             ],
             'permissions' => $this->getPermissionsViaRoles()->pluck('name'),
+            'cccd' => $this->cccd,
         ];
     }
 
