@@ -56,12 +56,6 @@ class TaskController extends Controller
         ]);
     }
 
-    // public function show($id)
-    // {
-    //     $task = Task::with(['category', 'assigner', 'mainAssignee', 'collaborators'])->findOrFail($id);
-    //     return new TaskResource($task);
-    // }
-
     public function store(TaskStoreRequest $request)
     {
         $user = $request->user();

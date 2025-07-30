@@ -130,6 +130,9 @@ class TaskRepository extends BaseRepository implements TaskRepositoryInterface
                     $user->notify(new \App\Notifications\TaskRelatedNotification($notificationData));
                     // Broadcast event public channel
                     event(new \App\Events\TaskNotificationBroadcasted($user->id, $notificationData));
+
+                    // Gửi mail qua queue
+                    \App\Jobs\SendTaskDetailMailJob::dispatch($task, $user);
                 }
             }
             DB::commit();
