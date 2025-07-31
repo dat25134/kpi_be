@@ -300,4 +300,25 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Download template file để import employees
+     * GET /api/employees/template
+     */
+    public function downloadTemplate()
+    {
+        $filePath = public_path('template-import-employees.xlsx');
+        
+        if (!file_exists($filePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Template file không tồn tại'
+            ], 404);
+        }
+
+        return response()->download($filePath, 'template-import-employees.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="template-import-employees.xlsx"'
+        ]);
+    }
 } 
