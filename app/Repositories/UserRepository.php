@@ -133,7 +133,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'experience' => $userInfoData['experience'] ?? null,
                 'skills' => $userInfoData['skills'] ?? [],
             ]);
-            DB::commit();
+
             // Nếu không phải import (tức là tạo thủ công), gửi email
             if (!$customPassword) {
                 SendEmployeePasswordEmailJob::dispatch(
@@ -143,6 +143,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                     $user->employee_id
                 );
             }
+
+            DB::commit();
             return $user->load(['info', 'department', 'projects']);
         } catch (\Exception $e) {
             DB::rollBack();
