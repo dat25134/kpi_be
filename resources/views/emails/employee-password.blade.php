@@ -127,7 +127,6 @@
                 <ul>
                     <li>Vui lòng đổi mật khẩu ngay sau khi đăng nhập lần đầu</li>
                     <li>Không chia sẻ thông tin đăng nhập với người khác</li>
-                    <li>Mật khẩu này chỉ được sử dụng một lần</li>
                 </ul>
             </div>
 

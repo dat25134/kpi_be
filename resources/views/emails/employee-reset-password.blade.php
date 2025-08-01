@@ -48,7 +48,6 @@
                 <ul>
                     <li>Vui lòng đổi mật khẩu ngay sau khi đăng nhập lại hệ thống.</li>
                     <li>Không chia sẻ thông tin đăng nhập với người khác.</li>
-                    <li>Mật khẩu này chỉ sử dụng một lần cho lần đăng nhập tiếp theo.</li>
                 </ul>
             </div>
             <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng liên hệ ngay với bộ phận IT để được hỗ trợ.</p>
