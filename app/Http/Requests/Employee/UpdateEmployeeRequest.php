@@ -18,7 +18,7 @@ class UpdateEmployeeRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $userId,
             'phone' => 'nullable|string|max:20|unique:users,phone,' . $userId,
-            'departmentId' => 'required|integer|exists:departments,id',
+            'departmentId' => 'nullable|integer|exists:departments,id',
             'salary' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
             'birthDate' => 'nullable|date|date_format:Y-m-d',
@@ -27,7 +27,7 @@ class UpdateEmployeeRequest extends FormRequest
             'experience' => 'nullable|string',
             'skills' => 'nullable|array',
             'roleName' => 'required|string|exists:roles,name',
-            'cccd' => 'nullable|string|max:20|unique:users,cccd,' . $userId,
+            'cccd' => 'required|string|max:20|unique:users,cccd,' . $userId,
             'joinDate' => 'nullable|date|date_format:Y-m-d',
         ];
     }
@@ -44,7 +44,6 @@ class UpdateEmployeeRequest extends FormRequest
             'phone.string' => 'Số điện thoại phải là chuỗi ký tự.',
             'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
             'phone.unique' => 'Số điện thoại đã tồn tại.',
-            'departmentId.required' => 'Phòng ban là bắt buộc.',
             'departmentId.integer' => 'ID phòng ban phải là số nguyên.',
             'departmentId.exists' => 'Phòng ban không tồn tại.',
             'salary.numeric' => 'Lương phải là số.',
@@ -59,6 +58,7 @@ class UpdateEmployeeRequest extends FormRequest
             'roleName.required' => 'Vai trò là bắt buộc.',
             'roleName.string' => 'Vai trò phải là chuỗi ký tự.',
             'roleName.exists' => 'Vai trò không tồn tại.',
+            'cccd.required' => 'CCCD là bắt buộc.',
             'cccd.string' => 'CCCD phải là chuỗi ký tự.',
             'cccd.max' => 'CCCD không được vượt quá 20 ký tự.',
             'cccd.unique' => 'CCCD đã tồn tại.',
